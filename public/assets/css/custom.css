@@ -1,0 +1,4 @@
+.dual-listbox .dual-listbox__container .dual-listbox__available,
+.dual-listbox .dual-listbox__container .dual-listbox__selected {
+  width: 450px !important;
+}
