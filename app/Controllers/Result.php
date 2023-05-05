@@ -7,6 +7,39 @@ use App\Controllers\Support\Pdf;
 
 class Result extends GlobalController
 {
+	private function rumusData(array $data)
+	{
+		$jumlahData = count($data);
+		$jumlahNilai = array_sum($data);
+		$mean = $jumlahNilai/$jumlahData;
+
+		$jumlahSelisihKuadrat = 0;
+		foreach($data as $nilai) {
+			$selisih = $nilai - $mean;
+			$selisihKuadrat = $selisih * $selisih;
+
+			$jumlahSelisihKuadrat += $selisihKuadrat;
+		}
+
+		$variansi = $jumlahSelisihKuadrat / ($jumlahData - 1);
+		$standarDeviasi = sqrt($variansi);
+
+		$result = [
+			'jumlahData' => $jumlahData,
+			'jumlahNilai' => $jumlahNilai,
+			'mean'	=> $mean,
+			'standarDeviasi' => $standarDeviasi
+		];
+
+		return $result;
+	}
+
+	private function rumusZ($data, $hasil_hitung){
+		$skorZ = ($data - $hasil_hitung['mean']) / $hasil_hitung['standarDeviasi'];
+
+		return $skorZ;
+	}
+
 	public function index($resultID)
 	{
 		try {
@@ -107,7 +140,7 @@ class Result extends GlobalController
 				'order' => [['open', 'desc']]
 			];
 			$data = $mUsersTests->efektif($params);
-
+			$array_score = [];
 			
 			foreach($data['rows'] as $key => $value){
 				$answers = json_decode($value['answers']);
@@ -115,16 +148,36 @@ class Result extends GlobalController
 				
 				$data['rows'][$key]['scoring'] = 0;
 
+				$data['rows'][$key]['data_answer'] = [];
 
 				foreach ($answers as $a => $b) {
-					$data['rows'][$key]['scoring'] += (int)($skor = $mAnswer->baris($b, ['select' => 'dimension_id, point'])) ? $skor['point'] : "0";
-					print_r($b);
+					$point = (int)($skor = $mAnswer->baris($b, ['select' => 'dimension_id, c.name, point'])) ? $skor['point'] : "0";
+					
 					print_r('<br><br>');
 					print_r($skor);
 					print_r('<br><br>');
+
+					$data['rows'][$key]['scoring'] += $point;
+
+					$data['rows'][$key]['data_answer'][$skor['dimension_id']] = ['detail' => [], 'point' => 0];
+					array_push($data['rows'][$key]['data_answer'][$skor['dimension_id']]['detail'], $skor);
+					
+					if(array_key_exists($skor['dimension_id'], $data['rows'][$key]['data_answer'])){
+						$data['rows'][$key]['data_answer'][$skor['dimension_id']]['point'] += $point;
+					}else{
+						$data['rows'][$key]['data_answer'][$skor['dimension_id']]['point'] = $skor;
+					}
 				}
-				print_r($data);
+				array_push($array_score, $data['rows'][$key]['scoring']);
 			}
+
+			$data['hasil_hitung'] = $this->rumusData($array_score);
+
+			foreach($data['rows'] as $key => $value){
+				$z_skor = $this->rumusZ($data['rows'][$key]['scoring'], $data['hasil_hitung']);
+				$data['rows'][$key]['z_scoring'] = $z_skor; 
+			}
+			print_r($data);
 		}catch(\Exception $e){
 			print_r($e->getMessage());
 		}
