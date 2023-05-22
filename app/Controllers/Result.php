@@ -40,6 +40,58 @@ class Result extends GlobalController
 		return $skorZ;
 	}
 
+	private function z_scoring($resultID)
+	{
+		try{
+			$id = $resultID;
+			$mUsersTests = new \App\Models\M_users_tests();
+			
+			$params = [
+				'where' => [
+					['a.test_id', $id, 'AND']
+				],
+				'order' => [['open', 'desc']]
+			];
+			$data = $mUsersTests->efektif($params);
+			$array_score = [];
+			$array_dimension = [];
+			
+			foreach($data['rows'] as $key => $value){
+				$answers = json_decode($value['answers']);
+				$mAnswer = new \App\Models\M_answers();
+				
+				$data['rows'][$key]['scoring'] = 0;
+
+				foreach ($answers as $a => $b) {
+					$skor = $mAnswer->baris($b, ['select' => 'a.id, dimension_id, c.name, point']);
+					$point = (int) ($skor ? $skor['point'] : 0);
+					
+					/* if (!isset($data['rows'][$key]['data_answer'][$skor['dimension_id']])) {
+						$data['rows'][$key]['data_answer'][$skor['dimension_id']] = ['detail' => [], 'data_point' => [],'point' => 0];
+					} */
+
+					/* array_push($array_dimension, $skor['dimension_id']);
+					array_push($data['rows'][$key]['data_answer'][$skor['dimension_id']]['detail'], $skor);
+					array_push($data['rows'][$key]['data_answer'][$skor['dimension_id']]['data_point'], $point); */
+					
+					$data['rows'][$key]['scoring'] += $point;
+				}
+				
+				array_push($array_score, $data['rows'][$key]['scoring']);
+			}
+
+			$data['hasil_hitung'] = $this->rumusData($array_score);
+
+			foreach($data['rows'] as $key => $value){
+				$z_skor = $this->rumusZ($data['rows'][$key]['scoring'], $data['hasil_hitung']);
+				//$data['rows'][$key]['z_scoring'] = $z_skor; 
+			}
+			return $data['hasil_hitung'];
+		}catch(\Exception $e){
+			return $e->getMessage();
+		}
+	}
+
 	public function index($resultID)
 	{
 		try {
@@ -126,60 +178,29 @@ class Result extends GlobalController
 		}
 	}
 
-	public function z_scoring($resultID)
+	public function finalZscoring($userId)
 	{
 		echo "<pre>";
-		try{
-			$id = $resultID;
-			$mUsersTests = new \App\Models\M_users_tests();
+		
+		$id          = $userId;
+		$mUsersTests = new \App\Models\M_users_tests();
+		$userTest    = $mUsersTests->baris($id);
+
+		$userTest['point'] = 0;
+		$userTest['hasil_hitung'] = $this->z_scoring($userTest['test_id']);
+
+		$answers = json_decode($userTest['answers']);
+		$mAnswer = new \App\Models\M_answers();
+		
+		foreach ($answers as $a => $b) {
+			$skor = $mAnswer->baris($b, ['select' => 'a.id, dimension_id, c.name, point']);
+			$point = (int) ($skor ? $skor['point'] : 0);
 			
-			$params = [
-				'where' => [
-					['a.test_id', $id, 'AND']
-				],
-				'order' => [['open', 'desc']]
-			];
-			$data = $mUsersTests->efektif($params);
-			$array_score = [];
-			
-			foreach($data['rows'] as $key => $value){
-				$answers = json_decode($value['answers']);
-				$mAnswer = new \App\Models\M_answers();
-				
-				$data['rows'][$key]['scoring'] = 0;
 
-				$data['rows'][$key]['data_answer'] = [];
-
-				foreach ($answers as $a => $b) {
-					$point = (int)($skor = $mAnswer->baris($b, ['select' => 'dimension_id, c.name, point'])) ? $skor['point'] : "0";
-					
-					print_r('<br><br>');
-					print_r($skor);
-					print_r('<br><br>');
-
-					$data['rows'][$key]['scoring'] += $point;
-
-					$data['rows'][$key]['data_answer'][$skor['dimension_id']] = ['detail' => [], 'point' => 0];
-					array_push($data['rows'][$key]['data_answer'][$skor['dimension_id']]['detail'], $skor);
-					
-					if(array_key_exists($skor['dimension_id'], $data['rows'][$key]['data_answer'])){
-						$data['rows'][$key]['data_answer'][$skor['dimension_id']]['point'] += $point;
-					}else{
-						$data['rows'][$key]['data_answer'][$skor['dimension_id']]['point'] = $skor;
-					}
-				}
-				array_push($array_score, $data['rows'][$key]['scoring']);
-			}
-
-			$data['hasil_hitung'] = $this->rumusData($array_score);
-
-			foreach($data['rows'] as $key => $value){
-				$z_skor = $this->rumusZ($data['rows'][$key]['scoring'], $data['hasil_hitung']);
-				$data['rows'][$key]['z_scoring'] = $z_skor; 
-			}
-			print_r($data);
-		}catch(\Exception $e){
-			print_r($e->getMessage());
+			$userTest['point'] += $point;
 		}
+
+		$userTest['scoring'] = $this->rumusZ($userTest['point'], $userTest['hasil_hitung']);
+		print_r($userTest);
 	}
 }
