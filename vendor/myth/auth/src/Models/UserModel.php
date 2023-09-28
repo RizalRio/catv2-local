@@ -101,6 +101,29 @@ class UserModel extends Model
         return $this;
     }
 
+    public function userActivation($id, $method = null)
+    {
+        $condition = (($method == 'active') ?  1 : (($method == 'deactive') ? 0 : 1));
+        $builder = $this->db->table('users');
+        $builder->set('active', $condition);
+        $builder->where('id', $id);
+        $builder->update();
+    }
+
+    public function userAddGroups($id, array $groups)
+    {
+        $builder = $this->db->table('auth_groups_users');
+        $builder->where('user_id', $id);
+        $userGroup = $builder->get();
+
+        if($userGroup) {
+            $builder->where('user_id', $id);
+            $userGroup = $builder->delete();
+        }
+
+        $builder->insertBatch($groups);
+    }
+    
     /**
      * If a default role is assigned in Config\Auth, will
      * add this user to that group. Will do nothing

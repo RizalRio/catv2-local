@@ -72,7 +72,7 @@
   </div>
   <div class="card-body">
 
-    <div class="datatable datatable-bordered datatable-head-custom" id="<?= $table; ?>"></div>
+    <div class="datatable im_datatable datatable-bordered datatable-head-custom" id="<?= $table; ?>"></div>
 
   </div>
 </div>

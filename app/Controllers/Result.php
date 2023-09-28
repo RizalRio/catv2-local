@@ -4,48 +4,108 @@ namespace App\Controllers;
 
 use \IM\CI\Controllers\GlobalController;
 use App\Controllers\Support\Pdf;
+use BadFunctionCallException;
+use Exception;
 
 class Result extends GlobalController
 {
 	private function rumusData(array $data)
 	{
-		$jumlahData = count($data);
-		$jumlahNilai = array_sum($data);
-		$mean = $jumlahNilai/$jumlahData;
+		try {
+			$jumlahData = count($data);
+			$jumlahNilai = array_sum($data);
+			$mean = $jumlahNilai / $jumlahData;
 
-		$jumlahSelisihKuadrat = 0;
-		foreach($data as $nilai) {
-			$selisih = $nilai - $mean;
-			$selisihKuadrat = $selisih * $selisih;
+			$variansi = 0;
+			foreach ($data as $nilai) {
+				$variansi += pow(($nilai - $mean), 2);
+			}
 
-			$jumlahSelisihKuadrat += $selisihKuadrat;
+			if ($jumlahData <= 1) {
+				$result = [
+					'jumlahData' => $jumlahData,
+					'jumlahNilai' => $jumlahNilai,
+					'mean'	=> $mean,
+					'standarDeviasi' => $mean,
+					'message' => 'Jumlah data hanya 1'
+				];
+
+				return $result;
+			}
+
+			$newVariansi = $variansi / ($jumlahData);
+			$standarDeviasi = sqrt($newVariansi);
+
+			$result = [
+				'jumlahData' => $jumlahData,
+				'jumlahNilai' => $jumlahNilai,
+				'mean'	=> $mean,
+				'standarDeviasi' => $standarDeviasi
+			];
+
+			return $result;
+		} catch (Exception $e) {
+			return $e->getMessage();
 		}
-
-		$variansi = $jumlahSelisihKuadrat / ($jumlahData - 1);
-		$standarDeviasi = sqrt($variansi);
-
-		$result = [
-			'jumlahData' => $jumlahData,
-			'jumlahNilai' => $jumlahNilai,
-			'mean'	=> $mean,
-			'standarDeviasi' => $standarDeviasi
-		];
-
-		return $result;
 	}
 
-	private function rumusZ($data, $hasil_hitung){
+	private function rumusZ($data, $hasil_hitung)
+	{
 		$skorZ = ($data - $hasil_hitung['mean']) / $hasil_hitung['standarDeviasi'];
 
 		return $skorZ;
 	}
 
+	private function rumusT($scoring)
+	{
+		$skorT = 50 + (10 * $scoring);
+		return $skorT;
+	}
+
+	private function kategorisasiT($arrayTScoring)
+	{
+		$XMin = min($arrayTScoring);
+		$XMax = max($arrayTScoring);
+		$mean = ($XMax + $XMin) / 2;
+		$sd = ($XMax - $XMin) / 6;
+		$data = [
+			'XMin' => $XMin,
+			'XMax' => $XMax,
+			'mean' => $mean,
+			'sd' => $sd
+		];
+
+		return $data;
+	}
+
+	private function checkKategorisasi($tScoring, $kategorisasiT)
+	{
+		$sr = $kategorisasiT['mean'] - (1.5 * $kategorisasiT['sd']);
+		$r = $kategorisasiT['mean'] - (0.5 * $kategorisasiT['sd']);
+		$t = $kategorisasiT['mean'] + (0.5 * $kategorisasiT['sd']);
+		$st = $kategorisasiT['mean'] + (1.5 * $kategorisasiT['sd']);
+
+		if ($tScoring <= $sr) {
+			$result = "Sangat Rendah";
+		} elseif ($tScoring > $sr && $tScoring <= $r) {
+			$result = "Rendah";
+		} elseif ($tScoring > $r && $tScoring <= $t) {
+			$result = "Sedang";
+		} elseif ($tScoring > $t && $tScoring <= $st) {
+			$result = "Tinggi";
+		} elseif ($tScoring > $st) {
+			$result = "Sangat Tinggi";
+		}
+
+		return $result;
+	}
+
 	private function z_scoring($resultID)
 	{
-		try{
+		try {
 			$id = $resultID;
 			$mUsersTests = new \App\Models\M_users_tests();
-			
+
 			$params = [
 				'where' => [
 					['a.test_id', $id, 'AND']
@@ -53,41 +113,77 @@ class Result extends GlobalController
 				'order' => [['open', 'desc']]
 			];
 			$data = $mUsersTests->efektif($params);
-			$array_score = [];
-			$array_dimension = [];
-			
-			foreach($data['rows'] as $key => $value){
+
+			foreach ($data['rows'] as $key => $value) {
 				$answers = json_decode($value['answers']);
 				$mAnswer = new \App\Models\M_answers();
-				
-				$data['rows'][$key]['scoring'] = 0;
 
+				$pointScoring = 0;
+
+				//! COBA DATA POINT PER DIMENSION USER BUKAN PER POIN SOAL
 				foreach ($answers as $a => $b) {
 					$skor = $mAnswer->baris($b, ['select' => 'a.id, dimension_id, c.name, point']);
 					$point = (int) ($skor ? $skor['point'] : 0);
-					
-					/* if (!isset($data['rows'][$key]['data_answer'][$skor['dimension_id']])) {
-						$data['rows'][$key]['data_answer'][$skor['dimension_id']] = ['detail' => [], 'data_point' => [],'point' => 0];
-					} */
 
-					/* array_push($array_dimension, $skor['dimension_id']);
-					array_push($data['rows'][$key]['data_answer'][$skor['dimension_id']]['detail'], $skor);
-					array_push($data['rows'][$key]['data_answer'][$skor['dimension_id']]['data_point'], $point); */
-					
-					$data['rows'][$key]['scoring'] += $point;
+					if (!isset($data['rows'][$key]['data_answer'][$skor['dimension_id']])) {
+						$data['rows'][$key]['data_answer'][$skor['dimension_id']] = ['data_point' => [], 'point' => 0];
+					}
+
+					array_push($data['rows'][$key]['data_answer'][$skor['dimension_id']]['data_point'], $point);
+					$data['rows'][$key]['data_answer'][$skor['dimension_id']]['point'] += $point;
+					$pointScoring += $point;
+
+					if (!isset($data['hasil_hitung_dimension'][$skor['dimension_id']])) {
+						$data['hasil_hitung_dimension'][$skor['dimension_id']] = ['user_point' => []];
+					}
+
+					if (!isset($data['hasil_hitung_dimension'][$skor['dimension_id']]['user_point'][$value['user_id']])) {
+						$data['hasil_hitung_dimension'][$skor['dimension_id']]['user_point'][$value['user_id']]  = 0;
+					}
+
+
+					$data['hasil_hitung_dimension'][$skor['dimension_id']]['user_point'][$value['user_id']] += $point;
 				}
-				
-				array_push($array_score, $data['rows'][$key]['scoring']);
 			}
 
-			$data['hasil_hitung'] = $this->rumusData($array_score);
+			foreach ($data['rows'] as $key => $value) {
+				$answers = json_decode($value['answers']);
+				$mAnswer = new \App\Models\M_answers();
 
-			foreach($data['rows'] as $key => $value){
-				$z_skor = $this->rumusZ($data['rows'][$key]['scoring'], $data['hasil_hitung']);
-				//$data['rows'][$key]['z_scoring'] = $z_skor; 
+
+
+				foreach ($answers as $a => $b) {
+					$skor = $mAnswer->baris($b, ['select' => 'a.id, dimension_id, c.name, point']);
+
+					$dataSkor = $data['hasil_hitung_dimension'][$skor['dimension_id']]['user_point'];
+					$resultRumusData = $this->rumusData($dataSkor);
+
+					$data['hasil_hitung_dimension'][$skor['dimension_id']]['hasil_rumus'] = $resultRumusData;
+					$arrayTScoring = [];
+					foreach ($dataSkor as $k => $v) {
+						$z_scoring = $this->rumusZ($v, $resultRumusData);
+						$t_scoring = $this->rumusT($z_scoring);
+						$arrayTScoring[$k] = $t_scoring;
+
+						$data['hasil_hitung_dimension'][$skor['dimension_id']]['hasil_perhitungan_data'][$k] = [
+							'z_scoring' => $z_scoring
+						];
+					}
+
+					$kategorisasiT = $this->kategorisasiT($arrayTScoring);
+					$data['hasil_hitung_dimension'][$skor['dimension_id']]['kategorisasi_cek'] = $kategorisasiT;
+
+					foreach ($arrayTScoring as $p => $q) {
+						$kategorisasiCek = $this->checkKategorisasi($q, $kategorisasiT);
+						$data['hasil_hitung_dimension'][$skor['dimension_id']]['hasil_perhitungan_data'][$p] += [
+							't_scoring' => $q,
+							'kategorisasi_t' => $kategorisasiCek
+						];
+					}
+				}
 			}
-			return $data['hasil_hitung'];
-		}catch(\Exception $e){
+			return $data['hasil_hitung_dimension'];
+		} catch (\Exception $e) {
 			return $e->getMessage();
 		}
 	}
@@ -114,8 +210,8 @@ class Result extends GlobalController
 				$dim = $mDimension->baris($key);
 				$dim = (is_null($dim)) ? ['method' => 'X', 'name' => 'Y'] : $dim;
 				// $dimension[$dim['method']][$key] = $dim['name'];
-				$dimension[$dim['method']][$dim['name']] = $value;	
-				
+				$dimension[$dim['method']][$dim['name']] = $value;
+
 				$mNarrations = new \App\Models\M_Narrations();
 
 				$params = [
@@ -126,7 +222,7 @@ class Result extends GlobalController
 
 				$nar = $mNarrations->efektif($params);
 
-				foreach($nar['rows'] as $value){
+				foreach ($nar['rows'] as $value) {
 					$narrations[$dim['method']] = $value['description'];
 				}
 			}
@@ -135,7 +231,7 @@ class Result extends GlobalController
 			$fileName = 'result-' . $tes['id'] . '.png';
 			$qrcode   = $userDir . $fileName;
 			if (!file_exists($qrcode)) {
-				if(!file_exists($userDir))
+				if (!file_exists($userDir))
 					mkdir($userDir, 0777, true);
 
 				$options = new \chillerlan\QRCode\QROptions([
@@ -181,26 +277,33 @@ class Result extends GlobalController
 	public function finalZscoring($userId)
 	{
 		echo "<pre>";
-		
+
 		$id          = $userId;
 		$mUsersTests = new \App\Models\M_users_tests();
 		$userTest    = $mUsersTests->baris($id);
 
-		$userTest['point'] = 0;
-		$userTest['hasil_hitung'] = $this->z_scoring($userTest['test_id']);
+		if (empty($userTest)) {
+			return 'User belum melakukan test';
+		}
+
+		$userTest['hasil_hitung_dimensions'] = $this->z_scoring($userTest['test_id']);
 
 		$answers = json_decode($userTest['answers']);
 		$mAnswer = new \App\Models\M_answers();
-		
+
 		foreach ($answers as $a => $b) {
 			$skor = $mAnswer->baris($b, ['select' => 'a.id, dimension_id, c.name, point']);
 			$point = (int) ($skor ? $skor['point'] : 0);
-			
+			$dimension = $skor['dimension_id'];
 
-			$userTest['point'] += $point;
+			if (!isset($userTest['point'][$dimension])) {
+				$userTest['point'][$dimension] = ['total_point' => 0, 'detail_point' => []];
+			}
+
+			array_push($userTest['point'][$dimension]['detail_point'], $skor['point']);
+			$userTest['point'][$dimension]['total_point'] += $point;
+			$userTest['point'][$dimension]['point_result'] = $userTest['hasil_hitung_dimensions'][$dimension]['hasil_perhitungan_data'][$userTest['user_id']];
 		}
-
-		$userTest['scoring'] = $this->rumusZ($userTest['point'], $userTest['hasil_hitung']);
 		print_r($userTest);
 	}
 }

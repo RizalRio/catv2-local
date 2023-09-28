@@ -45,7 +45,8 @@ $routes->group('support', ['namespace' => 'IM\CI\Controllers'], function ($route
 		$routes->match(['get', 'post'], 'create', 'Users::create');
 		$routes->match(['get', 'post'], 'edit/(:any)', 'Users::edit/$1');
 		$routes->get('detail/(:any)', 'Users::detail/$1');
-		$routes->delete('delete/(:any)', 'Users::delete/$1');
+		$routes->match(['get', 'delete'], 'delete/(:any)', 'Users::delete/$1');
+		//$routes->delete('delete/(:any)', 'Users::delete/$1');
 	});
 	$routes->group('system-logs', function ($routes) {
 		$routes->get('/', 'SystemLogs::index');
