@@ -255,7 +255,7 @@ class Result extends GlobalController
 
 			$pdf->SetMargins(10, 20, 10, true);
 			$pdf->addPage();
-			$pdf->writeHTML(view('pdf/pengantar'), true, false, true, false, '');
+			$pdf->writeHTML(view('result_pdf/description_result'), true, false, true, false, '');
 
 			$data = [
 				'dimension' => $dimension,

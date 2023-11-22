@@ -119,7 +119,7 @@ class Account extends GlobalController
 			'type' => 'hidden',
 			'name' => 'id',
 			'field' => [
-				'id' => (isset($user['id'])) ? encryptUrl($user['id']) : ''
+				'id' => (isset($user['user_id'])) ? encryptUrl($user['user_id']) : ''
 			]
 		];
 		$forms['fullname'] = [

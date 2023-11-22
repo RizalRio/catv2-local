@@ -168,7 +168,7 @@ class Users extends AdminController
 				'name'        => 'fullname',
 				'id'          => 'fullname',
 				'placeholder' => 'Ex. John Doe',
-				'value'       => set_value('fullname', ($params['fullname']) ?? ''),
+				'value'       => set_value('fullname', ($params['name']) ?? ''),
 				'maxlength'   => '50',
 				'tabindex'    => ++$i,
 				'autofocus'   => 'true'
@@ -278,7 +278,7 @@ class Users extends AdminController
 
 		foreach ($groups as $key => $value) {
 			$optGroups[$j] = [
-				'name'     => 'groups[]',
+				'name'     => 'groups',
 				'text'     => $value['name'] . ' - ' . $value['description'],
 				'value'    => $value['id'],
 				'tabindex' => ++$i
@@ -349,9 +349,6 @@ class Users extends AdminController
 
 			$user = $users->where('email', $this->request->getPost('email'))->first();
 
-			$activation = [['user_id' => $user->id, 'group_id' => 2]];
-			$users->userAddGroups($user->id, $activation);
-
 			$userDetail = [
 				'user_id'  => $user->id,
 				'fullname' => $this->request->getPost('fullname'),
@@ -360,19 +357,12 @@ class Users extends AdminController
 			];
 
 			$data = $this->request->getPost();
-			if ($this->request->getMethod() == 'post') {
-				try{
-					$this->model->tambah($userDetail);
-					$this->im_message->add('success', "Data berhasil disimpan");
-					return redirect()->to('/support/users');
-				}catch(Exception $e){
-					$this->im_message->add('success', $e->getMessage());
-					return redirect()->to('/support/users');
-				}
+			if ($this->request->getMethod() == 'post' && $this->model->tambah($userDetail)) {
+				$this->im_message->add('success', "Data berhasil disimpan");
+				return redirect()->to('/support/users');
 			} else {
 				$this->im_message->add('danger', "Terjadi kesalahan saat menyimpan data");
 			}
-
 		} else {
 			if ($this->request->getMethod() == 'post')
 				$validation = \Config\Services::validation();
@@ -383,20 +373,19 @@ class Users extends AdminController
 		$this->data['breadCrumb'] = ['Dashboard' => 'support', 'Users' => 'users', 'Create' => 'create'];
 
 		$this->data['forms'] = $this->_form([], $validation);
-		$this->data['js']    = ['assets/js/users/form.js'];
+		$this->data['js']    = ['assets/js/users/form.min.js'];
 		$this->render('IM\CI\Views\vAForm');
 	}
 
 	private function _getDetail($id)
 	{
-		return $this->model->baris($id, ['select' => 'b.id, b.avatar, fullname, address, phone, email, username, active, GROUP_CONCAT(c.group_id) groups']);
+		return $this->model->baris($id, ['select' => 'b.id, fullname name, address, phone, email, username, active, GROUP_CONCAT(c.group_id) groups']);
 	}
 
 	public function edit($id)
 	{
 		$id = decryptUrl($id);
 		$data = $this->_getDetail($id);
-		$userModel = model('UserModel');
 
 		if (is_null($data)) {
 			$this->im_message->add('danger', "Data tidak ditemukan");
@@ -404,41 +393,32 @@ class Users extends AdminController
 		}
 
 		if ($this->validate([
-			'id' => 'required',
-			'fullname'  => 'required',
-			'username'  => 'required|alpha_numeric_space|min_length[3]',
-			'email'     => 'required|valid_email',
-		])) {			
-			$data = $this->request->getPost();
-			if ($data) {
+			'name'          => 'required',
+			'description'   => 'required',
+			'serial_number' => 'required',
+		])) {
+			$before = $after = [];
+			$newData = $this->request->getPost();
+			foreach ($newData as $key => $value) {
+				if ($key == 'id')
+					$value = decryptUrl($value);
+				if ($data[$key] != $value) {
+					$before[$key] = $data[$key];
+					$after[$key] = $value;
+				}
+			}
+			if ($before) {
+				$data = $this->request->getPost();
 				$data['id'] = $id;
-				if ($this->request->getMethod() == 'post' && $this->model->ubah($id, $data)) {
-					if(isset($data['active']) && $data['active'] = 1){
-						$userModel->userActivation($id);
-					}else{
-						$userModel->userActivation($id, 'deactive');
-					}
-
-					$dataGroups = [];
-					if(isset($data['groups'])){
-						foreach($data['groups'] as $key => $value){
-							array_push($dataGroups, ['user_id' => $id, 'group_id' => $value]);
-						}
-
-						$userModel->userAddGroups($id, $dataGroups);
-					}else{
-						array_push($dataGroups, ['user_id' => $id, 'group_id' => 2]);
-						$userModel->userAddGroups($id, $dataGroups);
-					}
-
+				if ($this->request->getMethod() == 'post' && $this->model->ubah($data)) {
 					$this->im_message->add('success', "Data berhasil diperbarui");
-					return redirect()->to('/support/users');
+					return redirect()->to('/support/devices');
 				} else {
 					$this->im_message->add('danger', "Terjadi kesalahan saat menyimpan data");
 				}
 			} else {
 				$this->im_message->add('info', "Tidak ada perubahan data");
-				return redirect()->to('/support/users');
+				return redirect()->to('/support/devices');
 			}
 		} else {
 			if ($this->request->getMethod() == 'post')
@@ -452,7 +432,7 @@ class Users extends AdminController
 		$this->data['breadCrumb'] = ['Dashboard' => 'support', 'Users' => 'users', 'Edit' => 'edit'];
 
 		$this->data['forms'] = $this->_form($data, $validation);
-		$this->data['js']    = ['assets/js/users/form.js'];
+		$this->data['js']    = ['assets/js/users/form.min.js'];
 		$this->render('IM\CI\Views\vAForm');
 	}
 
@@ -474,38 +454,32 @@ class Users extends AdminController
 
 	public function delete($id)
 	{
-		$id   = decryptUrl($id);
-		if($this->request->getMethod() == 'get' && $this->request->isAJAX()){
-			$data = $this->_getDetail($id);
+		if ($this->request->getMethod() == 'delete' && $this->request->isAJAX()) {
+			$id   = decryptUrl($id);
+			$data = $this->model->find($id);
 
-			$this->data = [
-				'status' => ($data) ? TRUE : FALSE,
-				'message' => ($data) ? 'Data ditemukan' : 'Data tidak ditemukan',
-				'data' => ($data) ? encryptUrl($data['id']) : '',
-				'detail' => ($data) ? view('IM\CI\Views\vAModalDelete', ['data' => $data, 'softDelete' => \method_exists($this, 'restore')]) : ''
-			];
-			$this->render();
-		}
-
-		if($this->request->getMethod() == 'delete' && $this->request->isAJAX()){
-			$data = $this->_getDetail($id);
-
-			if($data){
+			if ($data) {
 				$mode = $this->request->getRawInput()['permanent'];
 
-				if($mode == 'true')
-					$delete = $this->model->hapusPermanen($id);
-				else
-					$delete = $this->model->hapus($id);
-				
-				if($delete)
-					$this->im_logger->action('delete')->module($this->module)->moduleId($id)->note($data)->status('1')->log();
-				else
-					$this->im_logger->action('delete')->module($this->module)->moduleId($id)->status('0')->log();		
-				
-				$this->ajaxResponse(($delete) ? TRUE : FALSE, ($delete) ? 'Data berhasil dihapus' : 'Data gagal dihapus', $data);
+				// if ($mode == 'true')
+				// 	$delete = $this->model->hapusPermanen($id);
+				// else
+				// 	$delete = $this->model->hapus($id);
+				$delete = true;
+
+				$this->data = [
+					'status'  => ($delete) ? TRUE : FALSE,
+					'message' => ($delete) ? 'Data berhasil dihapus' : 'Data gagal dihapus',
+					'data'    => $data
+				];
+			} else {
+				$this->data = [
+					'status'  => FALSE,
+					'message' => 'Data tidak ditemukan',
+					'data'    => NULL
+				];
 			}
-			$this->ajaxResponse(FALSE, 'Data tidak ditemukan');
-		} 
+			$this->render();
+		}
 	}
 }
