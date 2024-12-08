@@ -2,9 +2,10 @@
 
 namespace App\Controllers;
 
+use Mpdf\Mpdf;
+
 use \IM\CI\Controllers\GlobalController;
-use App\Controllers\Support\Pdf;
-use BadFunctionCallException;
+
 use Exception;
 
 class Result extends GlobalController
@@ -195,7 +196,9 @@ class Result extends GlobalController
 			$mUsersTests = new \App\Models\M_users_tests();
 			$tes         = $mUsersTests->baris($id);
 
-			$answers = json_decode($tes['answers']);
+			$zScoringData = $this->finalZscoring($id);
+
+			$answers = json_decode($zScoringData['answers']);
 			$scoring = [];
 			$mAnswer = new \App\Models\M_answers();
 			foreach ($answers as $key => $value) {
@@ -227,8 +230,8 @@ class Result extends GlobalController
 				}
 			}
 
-			$userDir  = 'uploads/' . $tes['username'] . '/';
-			$fileName = 'result-' . $tes['id'] . '.png';
+			$userDir  = 'uploads/' . $zScoringData['username'] . '/';
+			$fileName = 'result-' . $zScoringData['id'] . '.png';
 			$qrcode   = $userDir . $fileName;
 			if (!file_exists($qrcode)) {
 				if (!file_exists($userDir))
@@ -241,33 +244,50 @@ class Result extends GlobalController
 				$dataImg   = explode(',', $qr_base64);
 				file_put_contents($userDir . $fileName, base64_decode($dataImg[1]));
 			}
+			$dateTest = date_create($zScoringData['start']);
+			$dateTest = date_format($dateTest, "d-m-Y");
 
-			$pdf = new Pdf('P', PDF_UNIT, 'A4', true, 'UTF-8', false);
+			$mpdf = new Mpdf(['mode' => 'utf-8', 'format' => 'A4-P']);
 
-			$pdf->SetCreator('TITIAN KARIR');
-			$pdf->SetAuthor('Titian Indonesia');
-			$pdf->SetTitle('Hasil ' . $tes['name'] . ' - Titian Karir');
-			$pdf->SetSubject('Hasil ' . $tes['name'] . ' - Titian Karir');
+			//DIBAGI PER DIMENSION DIAMBIL DARI HASIL DATA HASIL
 
-			$data = ['data' => $tes, 'qrcode' => $qrcode];
-			$pdf->addPage();
-			$pdf->writeHTML(view('pdf/cover', $data), true, false, true, false, '');
+			$header = view('result_pdf/header_result', $zScoringData);
+			$footer = view('result_pdf/footer_result');
 
-			$pdf->SetMargins(10, 20, 10, true);
-			$pdf->addPage();
-			$pdf->writeHTML(view('result_pdf/description_result'), true, false, true, false, '');
+			$cover = view('result_pdf/cover_result', $zScoringData);
+			$description = view('result_pdf/description_result');
+			$riasec = view('result_pdf/riasec_result');
+			$carrer = view('result_pdf/carrer_result');
+			$kepribadian1 = view('result_pdf/kepribadian_result');
+			$kepribadian2 = view('result_pdf/kepribadian2_result');
+			$kepribadian3 = view('result_pdf/kepribadian3_result');
+			$end = view('result_pdf/end_result');
 
-			$data = [
-				'dimension' => $dimension,
-				'scoring' => $scoring,
-				'narration' => $narrations
-			];
-			$pdf->SetMargins(10, 20, 10, true);
-			$pdf->addPage();
-			$pdf->writeHTML(view('pdf/isi', $data), true, false, true, false, '');
+			$pdfName = 'Hasil Tes ' . $dateTest . ' - ' . $zScoringData['username'] . '.pdf';
 
-			$this->response->setContentType('application/pdf');
-			$pdf->Output('Hasil ' . $tes['name'] . ' - Titian Karir.pdf', 'I');
+			$mpdf->SetTitle($pdfName);
+
+			$mpdf->SetHTMLHeader($header);
+			$mpdf->SetHTMLFooter($footer);
+			$mpdf->WriteHTML($cover);
+			$mpdf->AddPage();
+			$mpdf->WriteHTML($description);
+			$mpdf->AddPage();
+			$mpdf->WriteHTML($riasec);
+			$mpdf->AddPage();
+			$mpdf->WriteHTML($carrer);
+			$mpdf->AddPage();
+			$mpdf->WriteHTML($kepribadian1);
+			$mpdf->AddPage();
+			$mpdf->WriteHTML($kepribadian2);
+			$mpdf->AddPage();
+			$mpdf->WriteHTML($kepribadian3);
+			$mpdf->AddPage();
+			$mpdf->WriteHTML($end);
+
+			$this->response->setHeader('Content-Type', 'application/pdf');
+
+			$mpdf->Output($pdfName, 'I');
 		} catch (\Exception $e) {
 			dd($e->getMessage());
 			$this->render('client/error');
@@ -276,8 +296,7 @@ class Result extends GlobalController
 
 	public function finalZscoring($userId)
 	{
-		echo "<pre>";
-
+		//echo "<pre>";
 		$id          = $userId;
 		$mUsersTests = new \App\Models\M_users_tests();
 		$userTest    = $mUsersTests->baris($id);
@@ -304,6 +323,7 @@ class Result extends GlobalController
 			$userTest['point'][$dimension]['total_point'] += $point;
 			$userTest['point'][$dimension]['point_result'] = $userTest['hasil_hitung_dimensions'][$dimension]['hasil_perhitungan_data'][$userTest['user_id']];
 		}
-		print_r($userTest);
+		//print_r($userTest);
+		return $userTest;
 	}
 }
