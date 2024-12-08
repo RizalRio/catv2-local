@@ -381,6 +381,9 @@ class Clients extends AdminController
 		$where = [
 			['a.user_id', $userID, 'AND']
 		];
+
+		$params['where'] = $where;
+		
 		if (isset($query['multiple'])) {
 			$fields = [
 				'name'        => 'name',
@@ -391,7 +394,6 @@ class Clients extends AdminController
 			foreach ($filters as $key => $filter) {
 				$where[] = [$fields[$key], $filter, 'AND'];
 			}
-			$params['where'] = $where;
 		}
 
 		if (isset($query['keyword'])) {
@@ -425,6 +427,7 @@ class Clients extends AdminController
 		$this->render();
 	}
 
+	// ! SALAH KUDUNE ORA NAME BOTH
 	public function gettestnot($id)
 	{
 		if (isAjax('get')) {

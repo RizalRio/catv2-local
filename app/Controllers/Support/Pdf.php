@@ -12,7 +12,7 @@ class Pdf extends TCPDF
     if ($this->page > 1) {
       $this->SetY(5);
       $this->SetFont('helvetica', '', 8);
-      $this->writeHTML(view('pdf/header', ['page' => $this->getAliasNumPage()]), true, false, true, false, '');
+      $this->writeHTML(view('result_pdf/header_result', ['page' => $this->getAliasNumPage()]), true, false, true, false, '');
     }
   }
 
@@ -21,7 +21,7 @@ class Pdf extends TCPDF
     if ($this->page == 1) {
       $this->SetY(-45);
       $this->SetFont('helvetica', 'I', 8);
-      $this->writeHTML(view('pdf/footer'), true, false, true, false, '');
+      $this->writeHTML(view('result_pdf/footer_result'), true, false, true, false, '');
     }
   }
 }

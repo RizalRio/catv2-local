@@ -68,7 +68,7 @@ $routes->add('autocomplete/(:any)', 'Autocomplete::index', ['filter' => 'login']
 $routes->get('result/(:any)', 'Result::index/$1');
 
 //dev
-$routes->get('zscoring/(:any)', 'Result::z_scoring/$1');
+$routes->get('zscoring/(:any)', 'Result::finalZscoring/$1');
 
 $routes->group('api/v1', ['namespace' => 'App\Controllers\Api\V1'], function ($routes) {
 	$routes->group('client', ['namespace' => 'App\Controllers\Api\V1\Client'], function ($routes) {
