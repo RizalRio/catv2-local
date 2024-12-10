@@ -211,7 +211,7 @@ class Result extends GlobalController
 				(!in_array($questionUser['method'], $methodCheck)) ? array_push($methodCheck, $questionUser['method']) : ''; 
 				
 			}
-			
+
 			if(in_array("RIASEC", $methodCheck) || in_array("Self Efficacy", $methodCheck)){
 				foreach ($answers as $a => $b) {
 					$userAnswers = $mAnswer->baris($b, ['select' => 'a.id, dimension_id, c.name dimension, d.name method, point']);
@@ -219,9 +219,20 @@ class Result extends GlobalController
 					$answersDimension = $userAnswers['dimension'];
 
 					if($answersMethod == "RIASEC") {
-						(!isset($scoring[$answersMethod][$answersDimension])) ? $scoring[$answersMethod][$answersDimension] = $userAnswers['point'] : $scoring[$answersMethod][$answersDimension] += $userAnswers['point']; 
-					} elseif($answersMethod == "Self Efficacy") {
-						
+						if (!isset($scoring[$answersMethod][$answersDimension])) {
+							$scoring[$answersMethod][$answersDimension] = ['point' => [], 'total' => 0];
+						}
+						array_push($scoring[$answersMethod][$answersDimension]['point'], $userAnswers['point']);
+						$scoring[$answersMethod][$answersDimension]['total'] += $userAnswers['point'];
+					} elseif($answersMethod == "Self Efficacy") { 
+						 if (!isset($scoring[$answersMethod][$answersDimension])) {
+							$scoring[$answersMethod][$answersDimension] = ['point' => [], 'total_point' => 0, 'value' => 0];
+						}
+						array_push($scoring[$answersMethod][$answersDimension]['point'], $userAnswers['point']);
+						$scoring[$answersMethod][$answersDimension]['total_point'] += $userAnswers['point'];
+						$total_point = $scoring[$answersMethod][$answersDimension]['total_point'];
+						$countAnswer = count($scoring[$answersMethod][$answersDimension]['point']);
+						$scoring[$answersMethod][$answersDimension]['value'] = $total_point/$countAnswer;
 					}
 				}
 
@@ -326,7 +337,6 @@ class Result extends GlobalController
 
 	public function finalScoring($userId)
 	{
-		echo "<pre>";
 		$id          = $userId;
 		$mUsersTests = new \App\Models\M_users_tests();
 		$userTest    = $mUsersTests->baris($id);
@@ -353,7 +363,6 @@ class Result extends GlobalController
 			$userTest['point'][$dimension]['total_point'] += $point;
 			$userTest['point'][$dimension]['point_result'] = $hasil_hitung_dimensions[$dimension]['hasil_perhitungan_data'][$userTest['user_id']];
 		}
-		print_r($userTest);
-		//return $userTest;
+		return $userTest;
 	}
 }
