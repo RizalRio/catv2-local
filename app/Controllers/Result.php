@@ -192,15 +192,45 @@ class Result extends GlobalController
 	public function index($resultID)
 	{
 		try {
+			echo "<pre>";
 			$id          = decryptUrl($resultID);
+			
 			$mUsersTests = new \App\Models\M_users_tests();
-			$tes         = $mUsersTests->baris($id);
-
-			$zScoringData = $this->finalZscoring($id);
-
-			$answers = json_decode($zScoringData['answers']);
-			$scoring = [];
+			$mQuestions = new \App\Models\M_questions();
 			$mAnswer = new \App\Models\M_answers();
+			
+			$tes         = $mUsersTests->baris($id);
+			
+			$scoring = [];
+			$methodCheck = [];
+			$questionId = explode(',', $tes['question']); 
+			$answers = json_decode($tes['answers']);
+			
+			foreach($questionId as $key => $value) {
+				$questionUser = $mQuestions->baris($value);
+				(!in_array($questionUser['method'], $methodCheck)) ? array_push($methodCheck, $questionUser['method']) : ''; 
+				
+			}
+			
+			if(in_array("RIASEC", $methodCheck) || in_array("Self Efficacy", $methodCheck)){
+				foreach ($answers as $a => $b) {
+					$userAnswers = $mAnswer->baris($b, ['select' => 'a.id, dimension_id, c.name dimension, d.name method, point']);
+					$answersMethod = $userAnswers['method'];
+					$answersDimension = $userAnswers['dimension'];
+
+					if($answersMethod == "RIASEC") {
+						(!isset($scoring[$answersMethod][$answersDimension])) ? $scoring[$answersMethod][$answersDimension] = $userAnswers['point'] : $scoring[$answersMethod][$answersDimension] += $userAnswers['point']; 
+					} elseif($answersMethod == "Self Efficacy") {
+						
+					}
+				}
+
+				print_r($scoring);
+			} else {
+				$scoringData = $this->finalScoring($id);
+				$answers = json_decode($scoringData['answers']);
+			}
+
 			foreach ($answers as $key => $value) {
 				$scoring[] = ($skor = $mAnswer->baris($value, ['select' => 'dimension_id'])) ? $skor['dimension_id'] : "0";
 			}
@@ -230,8 +260,8 @@ class Result extends GlobalController
 				}
 			}
 
-			$userDir  = 'uploads/' . $zScoringData['username'] . '/';
-			$fileName = 'result-' . $zScoringData['id'] . '.png';
+			$userDir  = 'uploads/' . $scoringData['username'] . '/';
+			$fileName = 'result-' . $scoringData['id'] . '.png';
 			$qrcode   = $userDir . $fileName;
 			if (!file_exists($qrcode)) {
 				if (!file_exists($userDir))
@@ -244,17 +274,17 @@ class Result extends GlobalController
 				$dataImg   = explode(',', $qr_base64);
 				file_put_contents($userDir . $fileName, base64_decode($dataImg[1]));
 			}
-			$dateTest = date_create($zScoringData['start']);
+			$dateTest = date_create($scoringData['start']);
 			$dateTest = date_format($dateTest, "d-m-Y");
 
 			$mpdf = new Mpdf(['mode' => 'utf-8', 'format' => 'A4-P']);
 
 			//DIBAGI PER DIMENSION DIAMBIL DARI HASIL DATA HASIL
 
-			$header = view('result_pdf/header_result', $zScoringData);
+			$header = view('result_pdf/header_result', $scoringData);
 			$footer = view('result_pdf/footer_result');
 
-			$cover = view('result_pdf/cover_result', $zScoringData);
+			$cover = view('result_pdf/cover_result', $scoringData);
 			$description = view('result_pdf/description_result');
 			$riasec = view('result_pdf/riasec_result');
 			$carrer = view('result_pdf/carrer_result');
@@ -263,7 +293,7 @@ class Result extends GlobalController
 			$kepribadian3 = view('result_pdf/kepribadian3_result');
 			$end = view('result_pdf/end_result');
 
-			$pdfName = 'Hasil Tes ' . $dateTest . ' - ' . $zScoringData['username'] . '.pdf';
+			$pdfName = 'Hasil Tes ' . $dateTest . ' - ' . $scoringData['username'] . '.pdf';
 
 			$mpdf->SetTitle($pdfName);
 
@@ -294,9 +324,9 @@ class Result extends GlobalController
 		}
 	}
 
-	public function finalZscoring($userId)
+	public function finalScoring($userId)
 	{
-		//echo "<pre>";
+		echo "<pre>";
 		$id          = $userId;
 		$mUsersTests = new \App\Models\M_users_tests();
 		$userTest    = $mUsersTests->baris($id);
@@ -304,12 +334,12 @@ class Result extends GlobalController
 		if (empty($userTest)) {
 			return 'User belum melakukan test';
 		}
-
-		$userTest['hasil_hitung_dimensions'] = $this->z_scoring($userTest['test_id']);
-
+		
+		$hasil_hitung_dimensions = $this->z_scoring($userTest['test_id']);
+		
 		$answers = json_decode($userTest['answers']);
 		$mAnswer = new \App\Models\M_answers();
-
+		
 		foreach ($answers as $a => $b) {
 			$skor = $mAnswer->baris($b, ['select' => 'a.id, dimension_id, c.name, point']);
 			$point = (int) ($skor ? $skor['point'] : 0);
@@ -321,9 +351,9 @@ class Result extends GlobalController
 
 			array_push($userTest['point'][$dimension]['detail_point'], $skor['point']);
 			$userTest['point'][$dimension]['total_point'] += $point;
-			$userTest['point'][$dimension]['point_result'] = $userTest['hasil_hitung_dimensions'][$dimension]['hasil_perhitungan_data'][$userTest['user_id']];
+			$userTest['point'][$dimension]['point_result'] = $hasil_hitung_dimensions[$dimension]['hasil_perhitungan_data'][$userTest['user_id']];
 		}
-		//print_r($userTest);
-		return $userTest;
+		print_r($userTest);
+		//return $userTest;
 	}
 }
