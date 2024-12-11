@@ -218,13 +218,13 @@ class Result extends GlobalController
 					$answersMethod = $userAnswers['method'];
 					$answersDimension = $userAnswers['dimension'];
 
-					if($answersMethod == "RIASEC") {
+					if($answersMethod == "RIASEC" || $answersMethod == "Minat Karir") {
 						if (!isset($scoring[$answersMethod][$answersDimension])) {
 							$scoring[$answersMethod][$answersDimension] = ['point' => [], 'total' => 0];
 						}
 						array_push($scoring[$answersMethod][$answersDimension]['point'], $userAnswers['point']);
 						$scoring[$answersMethod][$answersDimension]['total'] += $userAnswers['point'];
-					} elseif($answersMethod == "Self Efficacy") { 
+					} elseif($answersMethod == "Self Efficacy" || $answersMethod == "Kesiapan Kerja") { 
 						 if (!isset($scoring[$answersMethod][$answersDimension])) {
 							$scoring[$answersMethod][$answersDimension] = ['point' => [], 'total_point' => 0, 'value' => 0];
 						}
@@ -233,6 +233,23 @@ class Result extends GlobalController
 						$total_point = $scoring[$answersMethod][$answersDimension]['total_point'];
 						$countAnswer = count($scoring[$answersMethod][$answersDimension]['point']);
 						$scoring[$answersMethod][$answersDimension]['value'] = $total_point/$countAnswer;
+
+						if (!isset($scoring[$answersMethod]['global'])) {
+							$scoring[$answersMethod]['global'] = [
+								'total_point' => 0,
+								'total_questions' => 0,
+								'average' => 0
+							];
+						}
+				
+						$scoring[$answersMethod]['global']['total_point'] += $userAnswers['point'];
+						$scoring[$answersMethod]['global']['total_questions']++;
+					}
+				}
+
+				foreach (["Self Efficacy", "Kesiapan Kerja"] as $method) {
+					if (isset($scoring[$method]['global']) && $scoring[$method]['global']['total_questions'] > 0) {
+						$scoring[$method]['global']['average'] = $scoring[$method]['global']['total_point'] / $scoring[$method]['global']['total_questions'];
 					}
 				}
 
