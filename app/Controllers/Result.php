@@ -192,19 +192,21 @@ class Result extends GlobalController
 	public function index($resultID)
 	{
 		try {
-			echo "<pre>";
 			$id          = decryptUrl($resultID);
 			
 			$mUsersTests = new \App\Models\M_users_tests();
 			$mQuestions = new \App\Models\M_questions();
 			$mAnswer = new \App\Models\M_answers();
+			$mCarrer = new \App\Models\M_carrer_possibility();
 			
-			$tes         = $mUsersTests->baris($id);
+			$scoringData         = $mUsersTests->baris($id);
 			
 			$scoring = [];
 			$methodCheck = [];
-			$questionId = explode(',', $tes['question']); 
-			$answers = json_decode($tes['answers']);
+			$dimCheck = [];
+			$interestCheck = [];
+			$questionId = explode(',', $scoringData['question']); 
+			$answers = json_decode($scoringData['answers']);
 			
 			foreach($questionId as $key => $value) {
 				$questionUser = $mQuestions->baris($value);
@@ -212,33 +214,40 @@ class Result extends GlobalController
 				
 			}
 
-			if(in_array("RIASEC", $methodCheck) || in_array("Self Efficacy", $methodCheck)){
+			if(in_array("RIASEC", $methodCheck) || in_array("Self Efficacy", $methodCheck) || in_array("Minat Karir", $methodCheck) || in_array("Kesiapan Kerja", $methodCheck)){
 				foreach ($answers as $a => $b) {
 					$userAnswers = $mAnswer->baris($b, ['select' => 'a.id, dimension_id, c.name dimension, d.name method, point']);
 					$answersMethod = $userAnswers['method'];
 					$answersDimension = $userAnswers['dimension'];
 
 					if($answersMethod == "RIASEC" || $answersMethod == "Minat Karir") {
-						if (!isset($scoring[$answersMethod][$answersDimension])) {
-							$scoring[$answersMethod][$answersDimension] = ['point' => [], 'total' => 0];
+						if (!isset($scoring[$answersMethod]['data'][$answersDimension])) {
+							$scoring[$answersMethod]['data'][$answersDimension] = ['point' => [], 'total' => 0, 'percentage' => 0];	
 						}
-						array_push($scoring[$answersMethod][$answersDimension]['point'], $userAnswers['point']);
-						$scoring[$answersMethod][$answersDimension]['total'] += $userAnswers['point'];
+						array_push($dimCheck, $answersDimension);
+						array_push($scoring[$answersMethod]['data'][$answersDimension]['point'], $userAnswers['point']);
+						$scoring[$answersMethod]['data'][$answersDimension]['total'] += $userAnswers['point'];
+						$total = $scoring[$answersMethod]['data'][$answersDimension]['total'];
+						$scoring[$answersMethod]['data'][$answersDimension]['percentage'] = round(($total/count($scoring[$answersMethod]['data'][$answersDimension]['point'])) * 100);
 					} elseif($answersMethod == "Self Efficacy" || $answersMethod == "Kesiapan Kerja") { 
-						 if (!isset($scoring[$answersMethod][$answersDimension])) {
-							$scoring[$answersMethod][$answersDimension] = ['point' => [], 'total_point' => 0, 'value' => 0];
+						 if (!isset($scoring[$answersMethod]['data'][$answersDimension])) {
+							$scoring[$answersMethod]['data'][$answersDimension] = ['point' => [], 'total_point' => 0, 'value' => 0, 'percentage' => 0, 'max_point' => 0];
 						}
-						array_push($scoring[$answersMethod][$answersDimension]['point'], $userAnswers['point']);
-						$scoring[$answersMethod][$answersDimension]['total_point'] += $userAnswers['point'];
-						$total_point = $scoring[$answersMethod][$answersDimension]['total_point'];
-						$countAnswer = count($scoring[$answersMethod][$answersDimension]['point']);
-						$scoring[$answersMethod][$answersDimension]['value'] = $total_point/$countAnswer;
-
+						array_push($scoring[$answersMethod]['data'][$answersDimension]['point'], $userAnswers['point']);
+						$scoring[$answersMethod]['data'][$answersDimension]['total_point'] += $userAnswers['point'];
+						$total_point = $scoring[$answersMethod]['data'][$answersDimension]['total_point'];
+						$countAnswer = count($scoring[$answersMethod]['data'][$answersDimension]['point']);
+						$scoring[$answersMethod]['data'][$answersDimension]['value'] = $total_point/$countAnswer;
+						$scoring[$answersMethod]['data'][$answersDimension]['max_point'] = $countAnswer*5;
+						$scoring[$answersMethod]['data'][$answersDimension]['percentage'] = round(($total_point/$scoring[$answersMethod]['data'][$answersDimension]['max_point'])*100);
+						
 						if (!isset($scoring[$answersMethod]['global'])) {
 							$scoring[$answersMethod]['global'] = [
 								'total_point' => 0,
 								'total_questions' => 0,
-								'average' => 0
+								'average' => 0,
+								'percentage' => 0,
+								'max_point' => 0
 							];
 						}
 				
@@ -250,24 +259,60 @@ class Result extends GlobalController
 				foreach (["Self Efficacy", "Kesiapan Kerja"] as $method) {
 					if (isset($scoring[$method]['global']) && $scoring[$method]['global']['total_questions'] > 0) {
 						$scoring[$method]['global']['average'] = $scoring[$method]['global']['total_point'] / $scoring[$method]['global']['total_questions'];
+						$scoring[$method]['global']['max_point'] = ($scoring[$method]['global']['total_questions'] * 5);
+						$scoring[$method]['global']['percentage'] = round(($scoring[$method]['global']['total_point'] / $scoring[$method]['global']['max_point']) * 100);
 					}
 				}
 
-				print_r($scoring);
+				foreach (["Minat Karir"] as $method) {
+					foreach ($dimCheck as $dimension) {
+						if($scoring[$method]){
+							uksort($scoring[$method]['data'], function ($key1, $key2) use ($scoring, $method) {
+								return $scoring[$method]['data'][$key2]['percentage'] <=> $scoring[$method]['data'][$key1]['percentage'];
+							});
+						}
+					}
+					
+					$interestCheck = array_slice(
+						array_keys(
+							array_filter(
+								$scoring[$method]['data'],
+								function ($key) {
+									return in_array($key, ['R', 'I', 'A', 'S', 'E', 'C']);
+								},
+								ARRAY_FILTER_USE_KEY
+							)
+						),
+						0,
+						3
+					);
+					$scoring[$method]['dominan'] = $interestCheck;
+					$stringInterest = implode('', $interestCheck);
+					$recommendation = $mCarrer->baris($stringInterest);
+					$scoring[$method]['carrer_possibility'] =  explode(',', $recommendation['carrer_possibility']);
+				}
+
+				foreach ($answers as $key => $value) {
+					$dataDimension[] = ($skor = $mAnswer->baris($value, ['select' => 'dimension_id'])) ? $skor['dimension_id'] : "0";
+				}
+
+				$scoringData['scoring'] = $scoring;
 			} else {
 				$scoringData = $this->finalScoring($id);
+				
 				$answers = json_decode($scoringData['answers']);
+				
+				foreach ($answers as $key => $value) {
+					$dataDimension[] = ($skor = $mAnswer->baris($value, ['select' => 'dimension_id'])) ? $skor['dimension_id'] : "0";
+				}
 			}
 
-			foreach ($answers as $key => $value) {
-				$scoring[] = ($skor = $mAnswer->baris($value, ['select' => 'dimension_id'])) ? $skor['dimension_id'] : "0";
-			}
 			$mDimension = new \App\Models\M_dimensions();
 			$dimension  = [];
 			$narrations = [];
-			$scoring    = array_count_values($scoring);
-			ksort($scoring, 1);
-			foreach ($scoring as $key => $value) {
+			$dataDimension    = array_count_values($dataDimension);
+			ksort($dataDimension, 1);
+			foreach ($dataDimension as $key => $value) {
 				$dim = $mDimension->baris($key);
 				$dim = (is_null($dim)) ? ['method' => 'X', 'name' => 'Y'] : $dim;
 				// $dimension[$dim['method']][$key] = $dim['name'];
@@ -288,60 +333,59 @@ class Result extends GlobalController
 				}
 			}
 
-			$userDir  = 'uploads/' . $scoringData['username'] . '/';
-			$fileName = 'result-' . $scoringData['id'] . '.png';
-			$qrcode   = $userDir . $fileName;
-			if (!file_exists($qrcode)) {
-				if (!file_exists($userDir))
-					mkdir($userDir, 0777, true);
-
-				$options = new \chillerlan\QRCode\QROptions([
-					'version' => 8,
-				]);
-				$qr_base64 = (new \chillerlan\QRCode\QRCode($options))->render(site_url('result/' . encryptUrl($tes['id'])));
-				$dataImg   = explode(',', $qr_base64);
-				file_put_contents($userDir . $fileName, base64_decode($dataImg[1]));
-			}
 			$dateTest = date_create($scoringData['start']);
 			$dateTest = date_format($dateTest, "d-m-Y");
 
 			$mpdf = new Mpdf(['mode' => 'utf-8', 'format' => 'A4-P']);
 
 			//DIBAGI PER DIMENSION DIAMBIL DARI HASIL DATA HASIL
+			$cover = view('pdf/description_result/description_result', $scoringData);
 
-			$header = view('result_pdf/header_result', $scoringData);
-			$footer = view('result_pdf/footer_result');
-
-			$cover = view('result_pdf/cover_result', $scoringData);
-			$description = view('result_pdf/description_result');
-			$riasec = view('result_pdf/riasec_result');
-			$carrer = view('result_pdf/carrer_result');
-			$kepribadian1 = view('result_pdf/kepribadian_result');
-			$kepribadian2 = view('result_pdf/kepribadian2_result');
-			$kepribadian3 = view('result_pdf/kepribadian3_result');
-			$end = view('result_pdf/end_result');
+			if(in_array("RIASEC", $methodCheck) || in_array("Self Efficacy", $methodCheck) || in_array("Minat Karir", $methodCheck) || in_array("Kesiapan Kerja", $methodCheck)) {
+				$descriptionKarir1 = view('pdf/description_result/description_result_1', $scoringData);
+				$descriptionKarir2 = view('pdf/description_result/description_result_2', $scoringData);
+				$descriptionKarir3 = view('pdf/description_result/description_result_3', $scoringData);
+				$descriptionKarir4 = view('pdf/description_result/description_result_4', $scoringData);
+			} else {
+				$description = view('result_pdf/description_result');
+				$riasec = view('result_pdf/riasec_result');
+				$carrer = view('result_pdf/carrer_result');
+				$kepribadian1 = view('result_pdf/kepribadian_result');
+				$kepribadian2 = view('result_pdf/kepribadian2_result');
+				$kepribadian3 = view('result_pdf/kepribadian3_result');
+				$end = view('result_pdf/end_result');
+			}
 
 			$pdfName = 'Hasil Tes ' . $dateTest . ' - ' . $scoringData['username'] . '.pdf';
 
 			$mpdf->SetTitle($pdfName);
-
-			$mpdf->SetHTMLHeader($header);
-			$mpdf->SetHTMLFooter($footer);
 			$mpdf->WriteHTML($cover);
-			$mpdf->AddPage();
-			$mpdf->WriteHTML($description);
-			$mpdf->AddPage();
-			$mpdf->WriteHTML($riasec);
-			$mpdf->AddPage();
-			$mpdf->WriteHTML($carrer);
-			$mpdf->AddPage();
-			$mpdf->WriteHTML($kepribadian1);
-			$mpdf->AddPage();
-			$mpdf->WriteHTML($kepribadian2);
-			$mpdf->AddPage();
-			$mpdf->WriteHTML($kepribadian3);
-			$mpdf->AddPage();
-			$mpdf->WriteHTML($end);
+
+			if(in_array("RIASEC", $methodCheck) || in_array("Self Efficacy", $methodCheck) || in_array("Minat Karir", $methodCheck) || in_array("Kesiapan Kerja", $methodCheck)) {
+				$mpdf->AddPage();
+				$mpdf->WriteHTML($descriptionKarir1);
+				$mpdf->AddPage();
+				$mpdf->WriteHTML($descriptionKarir2);
+				$mpdf->AddPage();
+				$mpdf->WriteHTML($descriptionKarir3);
+				$mpdf->AddPage();
+				$mpdf->WriteHTML($descriptionKarir4);
+			} else {
+				$mpdf->AddPage();
+				$mpdf->WriteHTML($description);
+				$mpdf->AddPage();
+				$mpdf->WriteHTML($riasec);
+				$mpdf->AddPage();
+				$mpdf->WriteHTML($carrer);
+				$mpdf->AddPage();
+				$mpdf->WriteHTML($kepribadian1);
+				$mpdf->AddPage();
+				$mpdf->WriteHTML($kepribadian2);
+				$mpdf->AddPage();
+				$mpdf->WriteHTML($kepribadian3);
+				$mpdf->AddPage();
+				$mpdf->WriteHTML($end);
+			}
 
 			$this->response->setHeader('Content-Type', 'application/pdf');
 
