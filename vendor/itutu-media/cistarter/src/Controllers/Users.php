@@ -60,7 +60,7 @@ class Users extends AdminController
 
 		$this->data['forms']      = $forms;
 		$this->data['js']         = [
-			'assets/js/users/data.min.js'
+			'assets/js/' . $this->module . '/data.min.js'
 		];
 		$this->data['pageTitle']  = 'Users';
 		$this->data['title']      = 'Data Users';
@@ -288,13 +288,15 @@ class Users extends AdminController
 			$j++;
 		}
 
-		$forms['groups'] = [
-			'type'   => 'checkbox',
-			'style'  => 'list',
-			'label'  => 'Groups',
-			'name'   => 'groups',
-			'fields' => $optGroups
-		];
+		if($params['groups'] <> 0) {
+			$forms['groups'] = [
+				'type'   => 'checkbox',
+				'style'  => 'list',
+				'label'  => 'Groups',
+				'name'   => 'groups',
+				'fields' => $optGroups
+			];
+		}
 
 		$forms['active'] = [
 			'type'  => 'switch',
@@ -304,7 +306,7 @@ class Users extends AdminController
 			'fields' => [[
 				'name'     => 'active',
 				'id'       => 'active',
-				'value'    => '1',
+				'value'    => 1,
 				'tabindex' => ++$i,
 			]]
 		];
@@ -343,8 +345,9 @@ class Users extends AdminController
 			$allowedPostFields = array_merge(['password'], $this->config->validFields, $this->config->personalFields);
 			$user = new User($this->request->getPost($allowedPostFields));
 
-			$user->activate();
+			($this->request->getPost('active') == 1) ? $user->activate() : '';
 
+			$users = $users->withGroup($this->config->defaultUserGroup);
 			$users->save($user);
 
 			$user = $users->where('email', $this->request->getPost('email'))->first();
@@ -356,7 +359,6 @@ class Users extends AdminController
 				'phone'    => $this->request->getPost('phone')
 			];
 
-			$data = $this->request->getPost();
 			if ($this->request->getMethod() == 'post' && $this->model->tambah($userDetail)) {
 				$this->im_message->add('success', "Data berhasil disimpan");
 				return redirect()->to('/support/users');
@@ -372,7 +374,7 @@ class Users extends AdminController
 		$this->data['title']      = 'Create Users';
 		$this->data['breadCrumb'] = ['Dashboard' => 'support', 'Users' => 'users', 'Create' => 'create'];
 
-		$this->data['forms'] = $this->_form([], $validation);
+		$this->data['forms'] = $this->_form(['groups' => 0], $validation);
 		$this->data['js']    = ['assets/js/users/form.min.js'];
 		$this->render('IM\CI\Views\vAForm');
 	}
@@ -454,18 +456,30 @@ class Users extends AdminController
 
 	public function delete($id)
 	{
+		$usersModel = new \IM\CI\Models\App\M_users();
+		if ($this->request->getMethod() == 'get' && $this->request->isAJAX()) {
+			$id   = decryptUrl($id);
+			$data = $this->_getDetail($id);
+
+			$this->data = [
+				'status'  => ($data) ? TRUE : FALSE,
+				'message' => ($data) ? 'Data ditemukan' : 'Data tidak ditemukan',
+				'data'    => ($data) ? encryptUrl($data['id']) : '',
+				'detail'  => ($data) ? view('IM\CI\Views\vAModalDelete', ['data' => $data, 'softDelete' => method_exists($this, 'restore')]) : ''
+			];
+			$this->render();
+		}
 		if ($this->request->getMethod() == 'delete' && $this->request->isAJAX()) {
 			$id   = decryptUrl($id);
-			$data = $this->model->find($id);
+			$data = $usersModel->find($id);
 
 			if ($data) {
-				$mode = $this->request->getRawInput()['permanent'];
+				$delete = $usersModel->delete($id);
 
-				// if ($mode == 'true')
-				// 	$delete = $this->model->hapusPermanen($id);
-				// else
-				// 	$delete = $this->model->hapus($id);
-				$delete = true;
+				if ($delete)
+					$this->im_logger->action('delete')->module($this->module)->moduleId($id)->note($data)->status('1')->log();
+				else
+					$this->im_logger->action('delete')->module($this->module)->moduleId($id)->status('0')->log();
 
 				$this->data = [
 					'status'  => ($delete) ? TRUE : FALSE,
@@ -475,7 +489,7 @@ class Users extends AdminController
 			} else {
 				$this->data = [
 					'status'  => FALSE,
-					'message' => 'Data tidak ditemukan',
+					'message' => 'Terjadi kesalahan !',
 					'data'    => NULL
 				];
 			}

@@ -103,6 +103,7 @@ var getData = (function () {
 })();
 jQuery(document).ready(function () {
     getData.init();
+
   	$("#table_users").on("click", "[data-action='detail']", (function() {
         var id = $(this).attr("data-nya");
         $("[name=isPermanent]").attr("checked", !1),
