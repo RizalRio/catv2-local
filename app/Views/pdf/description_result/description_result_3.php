@@ -19,7 +19,7 @@
       }
 
       .section {
-        padding: 20px;
+        padding: 20px 30px;
         margin: 20px auto;
         max-width: 1200px;
         background: white;
@@ -37,7 +37,7 @@
 
       h3 {
         color: #384955;
-        margin-top: 30px;
+        margin: 0;
       }
 
       p {
@@ -62,6 +62,10 @@
         background-color: #577085;
         color: white;
         text-align: center;
+      }
+
+      .tr_table td {
+        font-size: 10px;
       }
 
       .table tr:nth-child(even) {
@@ -295,7 +299,7 @@
         </p>
       </div>
 
-      <h3>2. Self Efficacy</h3>
+      <h3 style="padding-top: 20px">2. Self Efficacy</h3>
       <div>
         <table class="table">
           <tr>
@@ -308,7 +312,7 @@
             <td>Skor Diperoleh</td>
             <td>Persentase</td>
             <td>Interpretasi</td>
-            <td>Keterangan</td>
+            <td style="width: 25%;">Keterangan</td>
           </tr>
           <tr>
             <td>Level</td>
@@ -327,7 +331,7 @@
                 }
               ?>
             </td>
-            <td style="width: 30%">
+            <td>
               Mengacu pada sejauh mana seseorang yakin dapat menyelesaikan
               tugas-tugas dengan berbagai tingkat kesulitan.
             </td>
@@ -349,7 +353,7 @@
                 }
               ?>
             </td>
-            <td style="width: 30%">
+            <td>
               Menggambarkan sejauh mana keyakinan diri berlaku di berbagai
               situasi atau bidang kehidupan.
             </td>
@@ -371,7 +375,7 @@
                 }
               ?>
             </td>
-            <td style="width: 30%">
+            <td>
               Mengacu pada seberapa kuat keyakinan seseorang dalam menghadapi
               tugas atau tantangan.
             </td>
@@ -438,41 +442,15 @@
         </p>
         <ol style="margin: 0">
           <li>
-            <strong>Meningkatkan Kemampuan Bekerja Sama</strong>
-            <p style="margin: 0">
-              Soft skills memungkinkan individu untuk bekerja lebih baik dengan
-              orang lain, baik dalam tim maupun dengan pihak eksternal. Dalam
-              lingkungan kerja yang beragam, kemampuan untuk menjalin komunikasi
-              yang efektif, menghargai perbedaan, dan menyelesaikan konflik
-              secara konstruktif menjadi kunci kesuksesan.
+            Soft skills membantu individu untuk bekerja lebih baik 
+            dengan orang lain, beradaptasi dalam lingkungan kerja yang 
+            beragam, dan memberikan kontribusi yang positif di tempat kerja.
             </p>
           </li>
           <li>
-            <strong>Beradaptasi dalam Lingkungan yang Dinamis</strong>
-            <p style="margin: 0">
-              Dunia kerja terus berkembang dengan perubahan teknologi, budaya,
-              dan kebijakan. Individu yang memiliki soft skills cenderung lebih
-              mudah beradaptasi dengan perubahan ini, sehingga tetap relevan dan
-              produktif di tempat kerja.
-            </p>
-          </li>
-          <li>
-            <strong>Meningkatkan Peluang Karir</strong>
-            <p style="margin: 0">
-              Dengan memiliki soft skills yang kuat, individu tidak hanya lebih
-              mudah mendapatkan pekerjaan, tetapi juga memiliki peluang lebih
-              besar untuk mempertahankannya, menerima promosi, dan berkembang
-              lebih jauh dalam karir mereka.
-            </p>
-          </li>
-          <li>
-            <strong>Membentuk Kontribusi Positif</strong>
-            <p style="margin: 0">
-              Individu dengan soft skills yang baik mampu memberikan kontribusi
-              positif terhadap lingkungan kerja mereka. Hal ini termasuk
-              membangun suasana kerja yang kondusif, meningkatkan produktivitas
-              tim, dan menciptakan solusi inovatif untuk tantangan yang dihadapi
-              organisasi.
+              Dengan memiliki soft skills yang kuat, individu tidak 
+              hanya lebih mudah mendapatkan pekerjaan, tetapi juga 
+              mempertahankannya dan berkembang dalam karir.
             </p>
           </li>
         </ol>

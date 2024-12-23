@@ -198,6 +198,7 @@ class Result extends GlobalController
 			$mQuestions = new \App\Models\M_questions();
 			$mAnswer = new \App\Models\M_answers();
 			$mCarrer = new \App\Models\M_carrer_possibility();
+			$mDevelopment = new \App\Models\M_development_recommendations();
 			
 			$scoringData         = $mUsersTests->baris($id);
 			
@@ -286,7 +287,14 @@ class Result extends GlobalController
 						0,
 						3
 					);
+					$scoring[$method]['development'] = [];
 					$scoring[$method]['dominan'] = $interestCheck;
+
+					foreach($scoring[$method]['dominan'] as $value){
+						$developmentRecommend = $mDevelopment->baris($value);
+						array_push($scoring[$method]['development'], $developmentRecommend);
+					}  
+
 					$stringInterest = implode('', $interestCheck);
 					$recommendation = $mCarrer->baris($stringInterest);
 					$scoring[$method]['carrer_possibility'] =  explode(',', $recommendation['carrer_possibility']);

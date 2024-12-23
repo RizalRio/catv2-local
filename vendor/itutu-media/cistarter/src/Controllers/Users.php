@@ -353,13 +353,21 @@ class Users extends AdminController
 			$user = $users->where('email', $this->request->getPost('email'))->first();
 
 			$userDetail = [
-				'user_id'  => $user->id,
-				'fullname' => $this->request->getPost('fullname'),
-				'address'  => $this->request->getPost('address'),
-				'phone'    => $this->request->getPost('phone')
+				'user_id'  		=> $user->id,
+				'fullname' 		=> $this->request->getPost('fullname'),
+				'address'  		=> $this->request->getPost('address'),
+				'phone'    		=> $this->request->getPost('phone'),
+				'age'			=> 0,
+				'gender'		=> 'R',
+				'education'		=> '',
+				'experience'	=> '',
+				'duration'		=> 0,
+				'concentration'	=> '',
+				'purpose'		=> '',
+				'complete_reg'	=> 0
 			];
 
-			if ($this->request->getMethod() == 'post' && $this->model->tambah($userDetail)) {
+			if ($this->request->getMethod() == 'post' && !is_null($this->model->tambah($userDetail))) {
 				$this->im_message->add('success', "Data berhasil disimpan");
 				return redirect()->to('/support/users');
 			} else {
@@ -386,6 +394,7 @@ class Users extends AdminController
 
 	public function edit($id)
 	{
+		//USERNAME DAN PASSWORD
 		$id = decryptUrl($id);
 		$data = $this->_getDetail($id);
 
@@ -395,32 +404,32 @@ class Users extends AdminController
 		}
 
 		if ($this->validate([
-			'name'          => 'required',
-			'description'   => 'required',
-			'serial_number' => 'required',
+			'fullname'  => 'required',
+			'username'  => 'alpha_numeric_space|min_length[3]',
+			'email'     => 'valid_email',
 		])) {
 			$before = $after = [];
 			$newData = $this->request->getPost();
 			foreach ($newData as $key => $value) {
 				if ($key == 'id')
 					$value = decryptUrl($value);
-				if ($data[$key] != $value) {
-					$before[$key] = $data[$key];
+				if ($newData[$key] != $value) {
+					$before[$key] = $newData[$key];
 					$after[$key] = $value;
 				}
 			}
 			if ($before) {
 				$data = $this->request->getPost();
 				$data['id'] = $id;
-				if ($this->request->getMethod() == 'post' && $this->model->ubah($data)) {
+				if ($this->request->getMethod() == 'post' && $this->model->ubah($id, $data)) {
 					$this->im_message->add('success', "Data berhasil diperbarui");
-					return redirect()->to('/support/devices');
+					return redirect()->to('/support/users');
 				} else {
 					$this->im_message->add('danger', "Terjadi kesalahan saat menyimpan data");
 				}
 			} else {
 				$this->im_message->add('info', "Tidak ada perubahan data");
-				return redirect()->to('/support/devices');
+				return redirect()->to('/support/users');
 			}
 		} else {
 			if ($this->request->getMethod() == 'post')

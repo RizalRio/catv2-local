@@ -19,7 +19,7 @@
       }
 
       .section {
-        padding: 20px;
+        padding: 10px 30px 10px 30px;
         margin: 20px auto;
         max-width: 1200px;
         background: white;
@@ -32,62 +32,66 @@
         margin-top: 30px;
       }
 
-      p {
+      p, ul, ol {
         text-align: justify;
+      }
+
+      br {
+        content: "";
+        margin: 1em;
+        display: block;
+        font-size: 10%;
       }
     </style>
   </head>
 
   <body>
     <header><h1 style="margin: 0">Hasil Tes</h1></header>
-    <div class="section" style="margin-bottom: 60px">
+    <div class="section" style="margin-bottom: 60px; page-break-after: always;">
       <h3 style="margin: 0">
         4. Rekomendasi Karir
         <hr />
       </h3>
-      <p>Berdasarkan hasil tes, berikut adalah beberapa karir yang sesuai:</p>
+      <p>Setelah mengetahui kombinasi tiga kode RIASEC Anda, penting untuk memanfaatkan rekomendasi karir sebagai panduan dalam memilih pekerjaan dan karir yang mendekati dengan kecenderungan kepribadian, berikut ini bebebrapa rekomendasi potensi karir yang sesuai dengna kode utama:</p>
       <ul>
         <?php foreach($scoring['Minat Karir']['carrer_possibility'] as $value) : ?>
           <li><?= $value ?></li>
         <?php endforeach; ?>
+      </ul>
+      <p>Berikut ini adalah bebebrapa langkah praktis untuk membantu penerapan hari hasil asesmen TIKAR ini, diantaranya berikut ini:</p>
+      <ul>
+        <li>Eksplorasi Peluang Karir yang Sesuai</li>
+        <li>Gunakan daftar rekomendasi karir untuk mengeksplorasi bidang pekerjaan yang sejalan dengan minat dan kepribadian Anda.</li>
+        <li>Lakukan riset lebih lanjut mengenai profesi yang disebutkan, seperti deskripsi pekerjaan, persyaratan pendidikan, dan keterampilan yang dibutuhkan.</li>
+        <li>Manfaatkan platform seperti ONET, LinkedIn, atau situs lowongan kerja lokal untuk memahami lebih dalam tentang peluang di bidang tersebut.</li>
       </ul>
 
       <h3>
         5. Rekomendasi Pengembangan Diri
         <hr />
       </h3>
+      <p>Pengembangan diri merupakan langkah penting dalam mencapai potensi terbaik seseorang, baik dalam karir maupun kehidupan pribadi. Berdasarkan teori kepribadian Holland, pengembangan diri dapat disesuaikan dengan kombinasi kode yang mencerminkan minat, kepribadian, dan preferensi individu terhadap berbagai aktivitas. Setiap kode dalam RIASEC memiliki karakteristik unik yang menggambarkan pendekatan seseorang terhadap pekerjaan, interaksi sosial, dan tantangan profesional. Oleh karena itu, rekomendasi pengembangan diri ini dirancang untuk membantu memahami ketrampilan-ketrampilan tertentu yang perlu dikembangkan. Berikut ini beberapa saran untuk pengembangan diri dengan mengacu pada kode utama:</p>
       <ol>
-        <li>
-          Ikuti pelatihan teknis dan kreatif seperti desain CAD atau pelatihan
-          perangkat keras.
-        </li>
-        <li>
-          Tingkatkan keterampilan komunikasi untuk menyampaikan ide-ide teknis.
-        </li>
-        <li>
-          Bergabung dalam komunitas profesional untuk memperluas jaringan.
-        </li>
-        <li>
-          Coba magang atau proyek sukarela untuk memperkuat pengalaman Anda.
-        </li>
-        <li>Pertimbangkan pendidikan lanjutan di bidang teknik atau desain.</li>
+        <?php foreach($scoring['Minat Karir']['development'] as $recommendations) : ?>
+          <li><?= $recommendations['development'] ?></li>
+        <?php endforeach; ?>
       </ol>
     </div>
 
     <header><h1 style="margin: 0">Penutup</h1></header>
     <div class="section">
-      <p>
+      <p style="margin: 0;">
         Hasil asesmen TIKAR memberikan wawasan yang penting tentang minat karir,
         kesiapan kerja, dan self-efficacy Anda. Informasi ini bertujuan untuk
         membantu Anda memahami potensi diri, mengidentifikasi area pengembangan,
         dan merancang langkah strategis dalam perjalanan karir Anda.
-        <br /><br />
+        <br /><br>
         Pengembangan karir tidak hanya tentang menemukan pekerjaan yang sesuai,
         tetapi juga tentang membangun keterampilan, memperkuat keyakinan diri,
         dan beradaptasi dengan dunia kerja yang dinamis. Untuk mendukung
         perjalanan ini, Anda dapat memanfaatkan sumber daya berikut:
       </p>
-      <ol>
+      <ol style="margin: 0">
         <li>
           <strong>O*NET Online</strong>: Basis data karir yang komprehensif
           untuk mengeksplorasi pekerjaan dan keterampilan yang relevan.
@@ -130,7 +134,7 @@
           >
         </li>
       </ol>
-      <p>
+      <p style="margin-bottom: 5px;">
         Gunakan hasil asesmen ini sebagai panduan untuk terus belajar,
         mengeksplorasi peluang baru, dan memperkuat kemampuan Anda. Ingatlah
         bahwa setiap langkah kecil yang Anda ambil hari ini adalah bagian dari
@@ -145,6 +149,10 @@
         <br /><br />Hormat kami, <br /><br />
         Tim Pengembangan Karir
       </p>
+    </div>
+    <div class="section" style="text-align: center">
+      <p style="text-align: center; margin: 0"><strong>Catatan Penting:</strong></p>
+      <p style="margin-top: 5px;">Rekomendasi ini adalah langkah awal untuk membantu Anda menemukan jalur karir yang sesuai. Setiap individu memiliki perjalanan karir yang unik, dan fleksibilitas serta keterbukaan untuk belajar akan membantu Anda mencapai tujuan karir yang diinginkan.</p>
     </div>
   </body>
 </html>

@@ -19,7 +19,7 @@
       }
 
       .section {
-        padding: 20px;
+        padding: 20px 30px;
         margin: 20px auto;
         max-width: 1200px;
         background: white;
