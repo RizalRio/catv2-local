@@ -20,6 +20,7 @@ class Configuration extends ApiController
             $this->data['companyPhone'] = getConfig('companyPhone');
             $this->data['generalInstruction'] = getConfig('generalInstruction');
             $this->data['userGuide'] = getConfig('petunjukPenggunaan');
+            $this->data['termsConditions'] = getConfig('termsConditions');
             return $this->render(TRUE, 'Data Berhasil Ditarik', $this->data);
         } catch (\Exception $e) {
             return $this->render(FALSE, $e->getMessage());

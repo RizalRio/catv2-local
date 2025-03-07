@@ -78,14 +78,6 @@
       <ul>
         <li><?= $value['title'] ?> - <?= $value['bright_outlook'] ?></li>
         <p style="margin: 0;"><?= $value['description'] ?></p>
-        <div>
-          <p style="margin: 0;">Skill yang dibutuhkan:</p>
-          <ul>
-            <?php foreach ($value['skills'] as $skill) : ?>
-              <li><?= $skill['element_name'] ?></li>
-            <?php endforeach; ?>
-          </ul>
-        </div>
       </ul>
     <?php endforeach; ?>
     <p>Berikut ini adalah bebebrapa langkah praktis untuk membantu penerapan dari hasil asesmen TIKAR ini, diantaranya berikut ini:</p>
@@ -104,6 +96,12 @@
     <ol>
       <?php foreach ($scoring['Minat Karir']['development'] as $recommendations) : ?>
         <li><?= $recommendations['development'] ?></li>
+      <?php endforeach; ?>
+    </ol>
+    <p>Berikut pengembangan diri untuk mepersiapkan diri anda dalam bekerja : </p>
+    <ol>
+      <?php foreach ($scoring['Kesiapan Kerja']['recommendation'] as $key => $value) : ?>
+        <li><?= $value ?></li>
       <?php endforeach; ?>
     </ol>
   </div>

@@ -55,6 +55,7 @@ class M_interest_occupation extends Model
 		$builder->orderBy("CASE WHEN interests_combination.interest = '$likeCombination' THEN 1 ELSE 2 END", false);
 		$builder->orderBy('interests_combination.interest', 'ASC');
 		$builder->orderBy('interests_combination.job_zone', 'ASC');
+		$builder->limit(10);
 
 		// Eksekusi query dan ambil hasil
 		return $builder->get()->getResultArray();

@@ -80,7 +80,7 @@
                           <?= getConfig('generalInstruction'); ?>
                         </div>
                         <div class="card-footer d-flex justify-content-between">
-                          <a href="<?= site_url('test/pause/' . encryptUrl($id) . '?goto=room/' . encryptUrl($test_id) . '&state=Active'); ?>" class="btn btn-light-danger font-weight-bold">Batal</a>
+                          <a href="<?= site_url('test/pause/' . encryptUrl($id) . '?goto=dashboard/&state=Active'); ?>" class="btn btn-light-danger font-weight-bold">Batal</a>
                           <a href="<?= site_url('test/do/' . encryptUrl($id)); ?>" class="btn btn-light-primary font-weight-bold">Mulai</a>
                         </div>
                       </div>
@@ -99,7 +99,7 @@
                           Terima kasih telah mengikuti tes.
                         </div>
                         <div class="card-footer d-flex justify-content-end">
-                          <a href="<?= site_url('dashboard'); ?>" class="btn btn-light-primary font-weight-bold">DASHBOARD</a>
+                          <a href="<?= site_url('dashboard'); ?>" class="btn btn-light-primary font-weight-bold mr-2">DASHBOARD</a>
                           <a href="<?= site_url('logout'); ?>" class="btn btn-danger font-weight-bold">LOGOUT</a>
                         </div>
                       </div>

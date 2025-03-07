@@ -21,7 +21,7 @@ class Room extends PublicController
 			$mTests  = new \App\Models\M_tests();
 
 			$params = [
-				'select'=>["b.id", "a.name", "a.description", "IF(a.open = '0000-00-00', CAST(NOW() AS Date), a.open) 'open'", "IF(a.close = '0000-00-00', CAST(NOW() AS Date), a.close) 'close'", "a.time", "b.status"],
+				'select' => ["b.id", "a.name", "a.description", "IF(a.open = '0000-00-00', CAST(NOW() AS Date), a.open) 'open'", "IF(a.close = '0000-00-00', CAST(NOW() AS Date), a.close) 'close'", "a.time", "b.status"],
 				'join' => [
 					['users_tests b', 'test_id = a.id', 'LEFT']
 				],
@@ -42,7 +42,7 @@ class Room extends PublicController
 
 			$this->render('client/room');
 		} catch (\Exception $e) {
-			// d($e->getMessage());
+			d($e->getMessage());
 		}
 	}
 }

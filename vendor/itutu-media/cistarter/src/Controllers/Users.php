@@ -104,7 +104,7 @@ class Users extends AdminController
 					$where[] = [$key, $filter, 'AND'];
 				}
 			}
-			
+
 			$params['where'] = $where;
 
 			if (isset($query['keyword'])) {
@@ -168,7 +168,7 @@ class Users extends AdminController
 				'name'        => 'fullname',
 				'id'          => 'fullname',
 				'placeholder' => 'Ex. John Doe',
-				'value'       => set_value('fullname', ($params['name']) ?? ''),
+				'value'       => set_value('fullname', ($params['fullname']) ?? ''),
 				'maxlength'   => '50',
 				'tabindex'    => ++$i,
 				'autofocus'   => 'true'
@@ -280,7 +280,7 @@ class Users extends AdminController
 			$optGroups[$j] = [
 				'name'     => 'groups',
 				'text'     => $value['name'] . ' - ' . $value['description'],
-				'value'    => $value['id'],
+				'value'    => $value['name'],
 				'tabindex' => ++$i
 			];
 			if (in_array($value['id'], $selectedGroups))
@@ -288,7 +288,7 @@ class Users extends AdminController
 			$j++;
 		}
 
-		if($params['groups'] <> 0) {
+		if ($params['groups'] <> 0) {
 			$forms['groups'] = [
 				'type'   => 'checkbox',
 				'style'  => 'list',
@@ -347,7 +347,7 @@ class Users extends AdminController
 
 			($this->request->getPost('active') == 1) ? $user->activate() : '';
 
-			$users = $users->withGroup($this->config->defaultUserGroup);
+			$users = $users->withGroup($this->request->getPost('groups'));
 			$users->save($user);
 
 			$user = $users->where('email', $this->request->getPost('email'))->first();
@@ -382,14 +382,14 @@ class Users extends AdminController
 		$this->data['title']      = 'Create Users';
 		$this->data['breadCrumb'] = ['Dashboard' => 'support', 'Users' => 'users', 'Create' => 'create'];
 
-		$this->data['forms'] = $this->_form(['groups' => 0], $validation);
+		$this->data['forms'] = $this->_form(['groups' => 1], $validation);
 		$this->data['js']    = ['assets/js/users/form.min.js'];
 		$this->render('IM\CI\Views\vAForm');
 	}
 
 	private function _getDetail($id)
 	{
-		return $this->model->baris($id, ['select' => 'b.id, fullname name, address, phone, email, username, active, GROUP_CONCAT(c.group_id) groups']);
+		return $this->model->baris($id, ['select' => 'b.id, fullname, address, phone, email, username, active, GROUP_CONCAT(c.group_id) groups']);
 	}
 
 	public function edit($id)
@@ -397,6 +397,8 @@ class Users extends AdminController
 		//USERNAME DAN PASSWORD
 		$id = decryptUrl($id);
 		$data = $this->_getDetail($id);
+		$usersModel = model('UserModel');
+		$groupsUsersModel = new \App\Models\M_groups_auth_users();
 
 		if (is_null($data)) {
 			$this->im_message->add('danger', "Data tidak ditemukan");
@@ -408,24 +410,41 @@ class Users extends AdminController
 			'username'  => 'alpha_numeric_space|min_length[3]',
 			'email'     => 'valid_email',
 		])) {
-			$before = $after = [];
+			$detailsData = [];
+			$personalData = [];
+			$groupsUsers = [];
 			$newData = $this->request->getPost();
-			foreach ($newData as $key => $value) {
-				if ($key == 'id')
-					$value = decryptUrl($value);
-				if ($newData[$key] != $value) {
-					$before[$key] = $newData[$key];
-					$after[$key] = $value;
+
+			$detailKeys = ["fullname", "address", "phone"];
+
+			if ($newData) {
+				foreach ($newData as $key => $value) {
+					if (in_array($key, $detailKeys)) {
+						$detailsData[$key] = $value;
+					}
 				}
-			}
-			if ($before) {
-				$data = $this->request->getPost();
-				$data['id'] = $id;
-				if ($this->request->getMethod() == 'post' && $this->model->ubah($id, $data)) {
-					$this->im_message->add('success', "Data berhasil diperbarui");
-					return redirect()->to('/support/users');
-				} else {
-					$this->im_message->add('danger', "Terjadi kesalahan saat menyimpan data");
+
+				(!empty($newData['email']) && $newData['email'] != $data['email']) ? $personalData['email'] = $newData['email'] : '';
+				(!empty($newData['username']) && $newData['username'] != $data['username']) ? $personalData['username'] = $newData['username'] : '';
+				//(!empty($newData['password'])) ? $personalData['password_hash'] = password_hash($newData['password'], PASSWORD_DEFAULT) : '';
+				($this->request->getPost('active') == 1) ? $personalData['active'] = 1 : $personalData['active'] = 0;
+				(!empty($newData['groups'])) ? $groupsUsers['group_id'] = $groupsUsersModel->withGroup($newData['groups']) : '';
+
+				if ($personalData) {
+					$usersModel->update(['id' => $id], $personalData);
+				}
+
+				if ($groupsUsers) {
+					$groupsUsersModel->update(['user_id' => $id], $groupsUsers);
+				}
+
+				if ($detailsData) {
+					if ($this->request->getMethod() == 'post' && $this->model->ubah($id, $detailsData)) {
+						$this->im_message->add('success', "Data berhasil diperbarui");
+						return redirect()->to('/support/users');
+					} else {
+						$this->im_message->add('danger', "Terjadi kesalahan saat menyimpan data");
+					}
 				}
 			} else {
 				$this->im_message->add('info', "Tidak ada perubahan data");

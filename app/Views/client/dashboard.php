@@ -22,11 +22,11 @@
                 elseif ((date('Y-m-d') >= $test['open']) && (date('Y-m-d') <= $test['close'])) :
                 ?>
                   <?php if ($test['status'] == 'Active' || $test['status'] == 'Ready') : ?>
-                    <a href="<?= site_url('test/instruction/' . ($test['id'])); ?>" class="btn btn-success font-weight-bolder font-size-sm">
+                    <a href="<?= site_url('test/term/' . ($test['id'])); ?>" class="btn btn-success font-weight-bolder font-size-sm">
                       Kerjakan
                     </a>
                   <?php elseif ($test['status'] == 'Ongoing' || $test['status'] == 'Pause') : ?>
-                    <a href="<?= site_url('test/instruction/' . ($test['id'])); ?>" class="btn btn-warning font-weight-bolder font-size-sm">
+                    <a href="<?= site_url('test/term/' . ($test['id'])); ?>" class="btn btn-warning font-weight-bolder font-size-sm">
                       Lanjutkan
                     </a>
                   <?php elseif ($test['status'] == 'Done') : ?>

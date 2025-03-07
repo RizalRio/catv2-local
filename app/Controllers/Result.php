@@ -199,7 +199,7 @@ class Result extends GlobalController
 			$mAnswer = new \App\Models\M_answers();
 			$mCarrer = new \App\Models\M_carrer_possibility();
 			$mDevelopment = new \App\Models\M_development_recommendations();
-			$mInterest = new \App\MOdels\M_interest_occupation();
+			$mInterest = new \App\Models\M_interest_occupation();
 			$mSkills = new \App\Models\M_skills_occupation();
 
 			$scoringData         = $mUsersTests->baris($id);
@@ -266,7 +266,16 @@ class Result extends GlobalController
 					}
 				}
 
-				foreach (["Minat Karir"] as $method) {
+				$recommendationsWRS = [
+					"Problem Solving & Decision Making" => "Latih pengambilan keputusan dengan membuat keputusan cepat dalam situasi mendesak melalui simulasi atau skenario berbasis studi kasus. Tingkatkan pemecahan masalah kompleks dengan melibatkan diri dalam proyek lintas divisi untuk memahami berbagai sudut pandang dalam menyelesaikan masalah. Belajar dari pengalaman dengan refleksi terhadap keputusan sebelumnya untuk mengidentifikasi keberhasilan dan area yang perlu ditingkatkan. Ikut pelatihan terkait manajemen risiko dan analisis data untuk mendukung pengambilan keputusan berbasis informasi.",
+					"Organization & Planning" => "Gunakan alat manajemen proyek seperti Notion, Trello, atau Asana untuk meningkatkan efisiensi dalam merencanakan dan melacak pekerjaan. Buat tujuan SMART (Specific, Measurable, Achievable, Relevant, Time-bound) untuk memastikan rencana yang efektif. Praktikkan delegasi tugas dengan lebih baik kepada rekan kerja atau anggota tim. Prioritaskan tugas menggunakan metode Eisenhower Matrix untuk menentukan apa yang perlu dilakukan berdasarkan urgensi dan pentingnya.",
+					"Self-management" => "Tingkatkan disiplin diri dengan membuat jadwal harian yang terstruktur agar semua tugas terselesaikan tepat waktu. Luangkan waktu untuk refleksi diri mingguan guna mengevaluasi pencapaian dan menentukan perbaikan di masa depan. Pastikan keseimbangan antara pekerjaan dan kehidupan pribadi untuk menghindari burnout. Pelajari teknik manajemen stres seperti meditasi, yoga, atau olahraga rutin untuk menjaga kestabilan emosional.",
+					"Communication Skill" => "Latihan public speaking dengan bergabung dalam komunitas seperti Toastmasters untuk meningkatkan kepercayaan diri berbicara di depan umum. Gunakan feedback dari rekan kerja setelah presentasi atau berbicara dalam rapat untuk terus memperbaiki kemampuan. Tingkatkan kemampuan komunikasi tertulis dengan belajar menyusun email profesional dan laporan yang jelas. Asah storytelling untuk membuat komunikasi lebih menarik dan mudah dipahami.",
+					"Team Work" => "Tingkatkan kolaborasi dengan aktif berpartisipasi dalam diskusi kelompok dan memberikan kontribusi yang berarti. Bangun kepercayaan dengan bersikap transparan dan dapat diandalkan untuk menciptakan hubungan yang kuat dalam tim. Pahami peran masing-masing anggota tim untuk menciptakan sinergi yang lebih baik. Pelajari keterampilan resolusi konflik untuk menangani perbedaan pendapat secara profesional demi menjaga harmoni dalam tim.",
+					"Initiative & Enterprise" => "Berani mengambil tanggung jawab baru dengan mencoba tugas di luar zona nyaman. Pelajari inovasi dengan mengikuti seminar atau workshop untuk mempelajari cara berpikir kreatif dan menciptakan solusi baru. Amati tren industri untuk menemukan peluang baru yang dapat dimanfaatkan di tempat kerja. Mulai proyek pribadi untuk melatih inisiatif dan mengembangkan ide-ide baru secara praktis.",
+				];
+
+				foreach (["Minat Karir", "Kesiapan Kerja"] as $method) {
 					foreach ($dimCheck as $dimension) {
 						if ($scoring[$method]) {
 							uksort($scoring[$method]['data'], function ($key1, $key2) use ($scoring, $method) {
@@ -275,38 +284,53 @@ class Result extends GlobalController
 						}
 					}
 
-					$interestCheck = array_slice(
-						array_keys(
-							array_filter(
-								$scoring[$method]['data'],
-								function ($key) {
-									return in_array($key, ['R', 'I', 'A', 'S', 'E', 'C']);
-								},
-								ARRAY_FILTER_USE_KEY
-							)
-						),
-						0,
-						3
-					);
-					$scoring[$method]['development'] = [];
-					$scoring[$method]['dominan'] = $interestCheck;
+					if ($method == "Minat Karir") {
+						$interestCheck = array_slice(
+							array_keys(
+								array_filter(
+									$scoring[$method]['data'],
+									function ($key) {
+										return in_array($key, ['R', 'I', 'A', 'S', 'E', 'C']);
+									},
+									ARRAY_FILTER_USE_KEY
+								)
+							),
+							0,
+							3
+						);
+						$scoring[$method]['development'] = [];
+						$scoring[$method]['dominan'] = $interestCheck;
 
-					foreach ($scoring[$method]['dominan'] as $value) {
-						$developmentRecommend = $mDevelopment->baris($value);
-						array_push($scoring[$method]['development'], $developmentRecommend);
+						foreach ($scoring[$method]['dominan'] as $value) {
+							$developmentRecommend = $mDevelopment->baris($value);
+							array_push($scoring[$method]['development'], $developmentRecommend);
+						}
+
+						$carrerPossibility = $mInterest->getFilteredInterestsData($interestCheck);
+						$scoring[$method]['carrer_possibility']	= $carrerPossibility;
+
+						// foreach ($carrerPossibility as $column => $value) {
+						// 	$occupationSkills = $mSkills->getSkillsByOnetSocCode($value['onetsoc_code']);
+						// 	$scoring[$method]['carrer_possibility'][$column]['skills'] = $occupationSkills;
+						// }
+
+						// $stringInterest = implode('', $interestCheck);
+						// $recommendation = $mCarrer->baris($stringInterest);
+						// $scoring[$method]['carrer_possibility'] =  explode(',', $recommendation['carrer_possibility']);
+					} else if ($method == "Kesiapan Kerja") {
+						$recommendationPriority = [];
+						$getBottom = array_slice($scoring[$method]['data'], -2);
+						$getTop = array_slice($scoring[$method]['data'], 0, 1);
+						$newArray = array_merge($getTop, $getBottom);
+
+						foreach ($newArray as $key => $value) {
+							$recommendation = $recommendationsWRS[$key];
+
+							array_push($recommendationPriority, $recommendation);
+						}
+
+						$scoring[$method]['recommendation'] = $recommendationPriority;
 					}
-
-					$carrerPossibility = $mInterest->getFilteredInterestsData($interestCheck);
-					$scoring[$method]['carrer_possibility']	= $carrerPossibility;
-
-					foreach ($carrerPossibility as $column => $value) {
-						$occupationSkills = $mSkills->getSkillsByOnetSocCode($value['onetsoc_code']);
-						$scoring[$method]['carrer_possibility'][$column]['skills'] = $occupationSkills;
-					}
-
-					// $stringInterest = implode('', $interestCheck);
-					// $recommendation = $mCarrer->baris($stringInterest);
-					// $scoring[$method]['carrer_possibility'] =  explode(',', $recommendation['carrer_possibility']);
 				}
 
 				foreach ($answers as $key => $value) {

@@ -37,6 +37,11 @@
         <?= form_open('#', ['class' => 'form repeater', 'id' => 'form-fakultas']); ?>
         <?= form_hidden('form', 'test'); ?>
         <div class="form-group">
+          <h3>Terms and conditions</h3>
+          <?= form_textarea(['class' => 'form-control summernote', 'name' => 'terms', 'value' => getConfig('termsConditions')]); ?>
+        </div>
+        <br>
+        <div class="form-group">
           <h3>Intruksi umum</h3>
           <?= form_textarea(['class' => 'form-control summernote', 'name' => 'instruction', 'value' => getConfig('generalInstruction')]); ?>
         </div>
@@ -52,6 +57,7 @@
           <h3>Bagaimana Titian Karir dapat membantu Anda</h3>
           <?= form_textarea(['class' => 'form-control summernote', 'name' => 'how', 'value' => getConfig('bagaimana')]); ?>
         </div>
+        <br>
         <div class="form-group">
           <h3>Deskripsi hasil test</h3>
           <?= form_textarea(['class' => 'form-control summernote', 'name' => 'desc', 'value' => getConfig('deskripsiLaporan')]); ?>
