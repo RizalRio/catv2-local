@@ -70,16 +70,15 @@
       <hr />
     </h3>
     <p>Setelah mengetahui kombinasi tiga kode RIASEC Anda, penting untuk memanfaatkan rekomendasi karir sebagai panduan dalam memilih pekerjaan dan karir yang mendekati dengan kecenderungan kepribadian, berikut ini bebebrapa rekomendasi potensi karir yang sesuai dengna kode utama:</p>
-    <?php
-
-    use PhpOffice\PhpSpreadsheet\Chart\Title;
-
-    foreach ($scoring['Minat Karir']['carrer_possibility'] as $value) : ?>
-      <ul>
-        <li><?= $value['title'] ?> - <?= $value['bright_outlook'] ?></li>
-        <p style="margin: 0;"><?= $value['description'] ?></p>
-      </ul>
-    <?php endforeach; ?>
+    <?php if (isset($scoring['Minat Karir'])) : ?>
+      <?php
+      foreach ($scoring['Minat Karir']['carrer_possibility'] as $value) : ?>
+        <ul>
+          <li><?= $value['title'] ?> - <?= $value['bright_outlook'] ?></li>
+          <p style="margin: 0;"><?= $value['description'] ?></p>
+        </ul>
+      <?php endforeach; ?>
+    <?php endif; ?>
     <p>Berikut ini adalah bebebrapa langkah praktis untuk membantu penerapan dari hasil asesmen TIKAR ini, diantaranya berikut ini:</p>
     <ul>
       <li>Eksplorasi Peluang Karir yang Sesuai</li>
@@ -94,15 +93,19 @@
     </h3>
     <p>Pengembangan diri merupakan langkah penting dalam mencapai potensi terbaik seseorang, baik dalam karir maupun kehidupan pribadi. Berdasarkan teori kepribadian Holland, pengembangan diri dapat disesuaikan dengan kombinasi kode yang mencerminkan minat, kepribadian, dan preferensi individu terhadap berbagai aktivitas. Setiap kode dalam RIASEC memiliki karakteristik unik yang menggambarkan pendekatan seseorang terhadap pekerjaan, interaksi sosial, dan tantangan profesional. Oleh karena itu, rekomendasi pengembangan diri ini dirancang untuk membantu memahami ketrampilan-ketrampilan tertentu yang perlu dikembangkan. Berikut ini beberapa saran untuk pengembangan diri dengan mengacu pada kode utama:</p>
     <ol>
-      <?php foreach ($scoring['Minat Karir']['development'] as $recommendations) : ?>
-        <li><?= $recommendations['development'] ?></li>
-      <?php endforeach; ?>
+      <?php if (isset($scoring['Minat Karir'])) : ?>
+        <?php foreach ($scoring['Minat Karir']['development'] as $recommendations) : ?>
+          <li><?= $recommendations['development'] ?></li>
+        <?php endforeach; ?>
+      <?php endif; ?>
     </ol>
     <p>Berikut pengembangan diri untuk mepersiapkan diri anda dalam bekerja : </p>
     <ol>
-      <?php foreach ($scoring['Kesiapan Kerja']['recommendation'] as $key => $value) : ?>
-        <li><?= $value ?></li>
-      <?php endforeach; ?>
+      <?php if (isset($scoring['Kesiapan Kerja'])) : ?>
+        <?php foreach ($scoring['Kesiapan Kerja']['recommendation'] as $key => $value) : ?>
+          <li><?= $value ?></li>
+        <?php endforeach; ?>
+      <?php endif; ?>
     </ol>
   </div>
 

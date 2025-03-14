@@ -417,6 +417,7 @@ class Users extends AdminController
 
 			$detailKeys = ["fullname", "address", "phone"];
 
+
 			if ($newData) {
 				foreach ($newData as $key => $value) {
 					if (in_array($key, $detailKeys)) {
@@ -426,7 +427,10 @@ class Users extends AdminController
 
 				(!empty($newData['email']) && $newData['email'] != $data['email']) ? $personalData['email'] = $newData['email'] : '';
 				(!empty($newData['username']) && $newData['username'] != $data['username']) ? $personalData['username'] = $newData['username'] : '';
-				//(!empty($newData['password'])) ? $personalData['password_hash'] = password_hash($newData['password'], PASSWORD_DEFAULT) : '';
+				if (!empty($newData['password'])) {
+					$user = new User($this->request->getPost(['password']));
+					$personalData['password_hash'] = $user->password_hash;
+				}
 				($this->request->getPost('active') == 1) ? $personalData['active'] = 1 : $personalData['active'] = 0;
 				(!empty($newData['groups'])) ? $groupsUsers['group_id'] = $groupsUsersModel->withGroup($newData['groups']) : '';
 

@@ -52,7 +52,11 @@ class Result extends GlobalController
 
 	private function rumusZ($data, $hasil_hitung)
 	{
-		$skorZ = ($data - $hasil_hitung['mean']) / $hasil_hitung['standarDeviasi'];
+		if ($hasil_hitung['standarDeviasi'] != 0) {
+			$skorZ = ($data - $hasil_hitung['mean']) / $hasil_hitung['standarDeviasi'];
+		} else {
+			$skorZ = 0;
+		}
 
 		return $skorZ;
 	}
@@ -194,6 +198,15 @@ class Result extends GlobalController
 		try {
 			$id          = decryptUrl($resultID);
 
+			$recommendationsWRS = [
+				"Problem Solving & Decision Making" => "Latih pengambilan keputusan dengan membuat keputusan cepat dalam situasi mendesak melalui simulasi atau skenario berbasis studi kasus. Tingkatkan pemecahan masalah kompleks dengan melibatkan diri dalam proyek lintas divisi untuk memahami berbagai sudut pandang dalam menyelesaikan masalah. Belajar dari pengalaman dengan refleksi terhadap keputusan sebelumnya untuk mengidentifikasi keberhasilan dan area yang perlu ditingkatkan. Ikut pelatihan terkait manajemen risiko dan analisis data untuk mendukung pengambilan keputusan berbasis informasi.",
+				"Organization & Planning" => "Gunakan alat manajemen proyek seperti Notion, Trello, atau Asana untuk meningkatkan efisiensi dalam merencanakan dan melacak pekerjaan. Buat tujuan SMART (Specific, Measurable, Achievable, Relevant, Time-bound) untuk memastikan rencana yang efektif. Praktikkan delegasi tugas dengan lebih baik kepada rekan kerja atau anggota tim. Prioritaskan tugas menggunakan metode Eisenhower Matrix untuk menentukan apa yang perlu dilakukan berdasarkan urgensi dan pentingnya.",
+				"Self-management" => "Tingkatkan disiplin diri dengan membuat jadwal harian yang terstruktur agar semua tugas terselesaikan tepat waktu. Luangkan waktu untuk refleksi diri mingguan guna mengevaluasi pencapaian dan menentukan perbaikan di masa depan. Pastikan keseimbangan antara pekerjaan dan kehidupan pribadi untuk menghindari burnout. Pelajari teknik manajemen stres seperti meditasi, yoga, atau olahraga rutin untuk menjaga kestabilan emosional.",
+				"Communication Skill" => "Latihan public speaking dengan bergabung dalam komunitas seperti Toastmasters untuk meningkatkan kepercayaan diri berbicara di depan umum. Gunakan feedback dari rekan kerja setelah presentasi atau berbicara dalam rapat untuk terus memperbaiki kemampuan. Tingkatkan kemampuan komunikasi tertulis dengan belajar menyusun email profesional dan laporan yang jelas. Asah storytelling untuk membuat komunikasi lebih menarik dan mudah dipahami.",
+				"Team Work" => "Tingkatkan kolaborasi dengan aktif berpartisipasi dalam diskusi kelompok dan memberikan kontribusi yang berarti. Bangun kepercayaan dengan bersikap transparan dan dapat diandalkan untuk menciptakan hubungan yang kuat dalam tim. Pahami peran masing-masing anggota tim untuk menciptakan sinergi yang lebih baik. Pelajari keterampilan resolusi konflik untuk menangani perbedaan pendapat secara profesional demi menjaga harmoni dalam tim.",
+				"Initiative & Enterprise" => "Berani mengambil tanggung jawab baru dengan mencoba tugas di luar zona nyaman. Pelajari inovasi dengan mengikuti seminar atau workshop untuk mempelajari cara berpikir kreatif dan menciptakan solusi baru. Amati tren industri untuk menemukan peluang baru yang dapat dimanfaatkan di tempat kerja. Mulai proyek pribadi untuk melatih inisiatif dan mengembangkan ide-ide baru secara praktis.",
+			];
+
 			$mUsersTests = new \App\Models\M_users_tests();
 			$mQuestions = new \App\Models\M_questions();
 			$mAnswer = new \App\Models\M_answers();
@@ -216,7 +229,7 @@ class Result extends GlobalController
 				(!in_array($questionUser['method'], $methodCheck)) ? array_push($methodCheck, $questionUser['method']) : '';
 			}
 
-			if (in_array("RIASEC", $methodCheck) || in_array("Self Efficacy", $methodCheck) || in_array("Minat Karir", $methodCheck) || in_array("Kesiapan Kerja", $methodCheck)) {
+			if (array_intersect(["RIASEC", "Self Efficacy", "Minat Karir", "Kesiapan Kerja"], $methodCheck)) {
 				foreach ($answers as $a => $b) {
 					$userAnswers = $mAnswer->baris($b, ['select' => 'a.id, dimension_id, c.name dimension, d.name method, point']);
 					$answersMethod = $userAnswers['method'];
@@ -257,79 +270,71 @@ class Result extends GlobalController
 						$scoring[$answersMethod]['global']['total_questions']++;
 					}
 				}
-
-				foreach (["Self Efficacy", "Kesiapan Kerja"] as $method) {
-					if (isset($scoring[$method]['global']) && $scoring[$method]['global']['total_questions'] > 0) {
-						$scoring[$method]['global']['average'] = $scoring[$method]['global']['total_point'] / $scoring[$method]['global']['total_questions'];
-						$scoring[$method]['global']['max_point'] = ($scoring[$method]['global']['total_questions'] * 5);
-						$scoring[$method]['global']['percentage'] = round(($scoring[$method]['global']['total_point'] / $scoring[$method]['global']['max_point']) * 100);
-					}
-				}
-
-				$recommendationsWRS = [
-					"Problem Solving & Decision Making" => "Latih pengambilan keputusan dengan membuat keputusan cepat dalam situasi mendesak melalui simulasi atau skenario berbasis studi kasus. Tingkatkan pemecahan masalah kompleks dengan melibatkan diri dalam proyek lintas divisi untuk memahami berbagai sudut pandang dalam menyelesaikan masalah. Belajar dari pengalaman dengan refleksi terhadap keputusan sebelumnya untuk mengidentifikasi keberhasilan dan area yang perlu ditingkatkan. Ikut pelatihan terkait manajemen risiko dan analisis data untuk mendukung pengambilan keputusan berbasis informasi.",
-					"Organization & Planning" => "Gunakan alat manajemen proyek seperti Notion, Trello, atau Asana untuk meningkatkan efisiensi dalam merencanakan dan melacak pekerjaan. Buat tujuan SMART (Specific, Measurable, Achievable, Relevant, Time-bound) untuk memastikan rencana yang efektif. Praktikkan delegasi tugas dengan lebih baik kepada rekan kerja atau anggota tim. Prioritaskan tugas menggunakan metode Eisenhower Matrix untuk menentukan apa yang perlu dilakukan berdasarkan urgensi dan pentingnya.",
-					"Self-management" => "Tingkatkan disiplin diri dengan membuat jadwal harian yang terstruktur agar semua tugas terselesaikan tepat waktu. Luangkan waktu untuk refleksi diri mingguan guna mengevaluasi pencapaian dan menentukan perbaikan di masa depan. Pastikan keseimbangan antara pekerjaan dan kehidupan pribadi untuk menghindari burnout. Pelajari teknik manajemen stres seperti meditasi, yoga, atau olahraga rutin untuk menjaga kestabilan emosional.",
-					"Communication Skill" => "Latihan public speaking dengan bergabung dalam komunitas seperti Toastmasters untuk meningkatkan kepercayaan diri berbicara di depan umum. Gunakan feedback dari rekan kerja setelah presentasi atau berbicara dalam rapat untuk terus memperbaiki kemampuan. Tingkatkan kemampuan komunikasi tertulis dengan belajar menyusun email profesional dan laporan yang jelas. Asah storytelling untuk membuat komunikasi lebih menarik dan mudah dipahami.",
-					"Team Work" => "Tingkatkan kolaborasi dengan aktif berpartisipasi dalam diskusi kelompok dan memberikan kontribusi yang berarti. Bangun kepercayaan dengan bersikap transparan dan dapat diandalkan untuk menciptakan hubungan yang kuat dalam tim. Pahami peran masing-masing anggota tim untuk menciptakan sinergi yang lebih baik. Pelajari keterampilan resolusi konflik untuk menangani perbedaan pendapat secara profesional demi menjaga harmoni dalam tim.",
-					"Initiative & Enterprise" => "Berani mengambil tanggung jawab baru dengan mencoba tugas di luar zona nyaman. Pelajari inovasi dengan mengikuti seminar atau workshop untuk mempelajari cara berpikir kreatif dan menciptakan solusi baru. Amati tren industri untuk menemukan peluang baru yang dapat dimanfaatkan di tempat kerja. Mulai proyek pribadi untuk melatih inisiatif dan mengembangkan ide-ide baru secara praktis.",
-				];
-
-				foreach (["Minat Karir", "Kesiapan Kerja"] as $method) {
-					foreach ($dimCheck as $dimension) {
-						if ($scoring[$method]) {
-							uksort($scoring[$method]['data'], function ($key1, $key2) use ($scoring, $method) {
-								return $scoring[$method]['data'][$key2]['percentage'] <=> $scoring[$method]['data'][$key1]['percentage'];
-							});
+				foreach ($methodCheck as $method) {
+					if (in_array($method, ["Self Efficacy", "Kesiapan Kerja"])) {
+						if (isset($scoring[$method]['global']) && $scoring[$method]['global']['total_questions'] > 0) {
+							$scoring[$method]['global']['average'] = $scoring[$method]['global']['total_point'] / $scoring[$method]['global']['total_questions'];
+							$scoring[$method]['global']['max_point'] = ($scoring[$method]['global']['total_questions'] * 5);
+							$scoring[$method]['global']['percentage'] = round(($scoring[$method]['global']['total_point'] / $scoring[$method]['global']['max_point']) * 100);
 						}
 					}
 
-					if ($method == "Minat Karir") {
-						$interestCheck = array_slice(
-							array_keys(
-								array_filter(
-									$scoring[$method]['data'],
-									function ($key) {
-										return in_array($key, ['R', 'I', 'A', 'S', 'E', 'C']);
-									},
-									ARRAY_FILTER_USE_KEY
-								)
-							),
-							0,
-							3
-						);
-						$scoring[$method]['development'] = [];
-						$scoring[$method]['dominan'] = $interestCheck;
-
-						foreach ($scoring[$method]['dominan'] as $value) {
-							$developmentRecommend = $mDevelopment->baris($value);
-							array_push($scoring[$method]['development'], $developmentRecommend);
+					if (in_array($method, ["Minat Karir", "Kesiapan Kerja"])) {
+						foreach ($dimCheck as $dimension) {
+							if ($scoring[$method]) {
+								uksort($scoring[$method]['data'], function ($key1, $key2) use ($scoring, $method) {
+									return $scoring[$method]['data'][$key2]['percentage'] <=> $scoring[$method]['data'][$key1]['percentage'];
+								});
+							}
 						}
 
-						$carrerPossibility = $mInterest->getFilteredInterestsData($interestCheck);
-						$scoring[$method]['carrer_possibility']	= $carrerPossibility;
+						if ($method == "Minat Karir") {
+							$interestCheck = array_slice(
+								array_keys(
+									array_filter(
+										$scoring[$method]['data'],
+										function ($key) {
+											return in_array($key, ['R', 'I', 'A', 'S', 'E', 'C']);
+										},
+										ARRAY_FILTER_USE_KEY
+									)
+								),
+								0,
+								3
+							);
+							$scoring[$method]['development'] = [];
+							$scoring[$method]['dominan'] = $interestCheck;
 
-						// foreach ($carrerPossibility as $column => $value) {
-						// 	$occupationSkills = $mSkills->getSkillsByOnetSocCode($value['onetsoc_code']);
-						// 	$scoring[$method]['carrer_possibility'][$column]['skills'] = $occupationSkills;
-						// }
+							foreach ($scoring[$method]['dominan'] as $value) {
+								$developmentRecommend = $mDevelopment->baris($value);
+								array_push($scoring[$method]['development'], $developmentRecommend);
+							}
 
-						// $stringInterest = implode('', $interestCheck);
-						// $recommendation = $mCarrer->baris($stringInterest);
-						// $scoring[$method]['carrer_possibility'] =  explode(',', $recommendation['carrer_possibility']);
-					} else if ($method == "Kesiapan Kerja") {
-						$recommendationPriority = [];
-						$getBottom = array_slice($scoring[$method]['data'], -2);
-						$getTop = array_slice($scoring[$method]['data'], 0, 1);
-						$newArray = array_merge($getTop, $getBottom);
+							$carrerPossibility = $mInterest->getFilteredInterestsData($interestCheck);
+							$scoring[$method]['carrer_possibility']	= $carrerPossibility;
 
-						foreach ($newArray as $key => $value) {
-							$recommendation = $recommendationsWRS[$key];
+							// foreach ($carrerPossibility as $column => $value) {
+							// 	$occupationSkills = $mSkills->getSkillsByOnetSocCode($value['onetsoc_code']);
+							// 	$scoring[$method]['carrer_possibility'][$column]['skills'] = $occupationSkills;
+							// }
 
-							array_push($recommendationPriority, $recommendation);
+							// $stringInterest = implode('', $interestCheck);
+							// $recommendation = $mCarrer->baris($stringInterest);
+							// $scoring[$method]['carrer_possibility'] =  explode(',', $recommendation['carrer_possibility']);
+						} else if ($method == "Kesiapan Kerja") {
+							$recommendationPriority = [];
+							$getBottom = array_slice($scoring[$method]['data'], -2);
+							$getTop = array_slice($scoring[$method]['data'], 0, 1);
+							$newArray = array_merge($getTop, $getBottom);
+
+							foreach ($newArray as $key => $value) {
+								$recommendation = $recommendationsWRS[$key];
+
+								array_push($recommendationPriority, $recommendation);
+							}
+
+							$scoring[$method]['recommendation'] = $recommendationPriority;
 						}
-
-						$scoring[$method]['recommendation'] = $recommendationPriority;
 					}
 				}
 

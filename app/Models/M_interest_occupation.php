@@ -41,7 +41,7 @@ class M_interest_occupation extends Model
 		$builder->join('bright_outlook', 'interests_combination.onetsoc_code = bright_outlook.onetsoc_code', 'left');
 
 		// Pilih kolom yang dibutuhkan
-		$builder->select('interests_combination.*, occupation_data.description, bright_outlook.categories AS bright_outlook');
+		$builder->select('interests_combination.*, occupation_data.title, occupation_data.description, bright_outlook.categories AS bright_outlook');
 
 		// Filter dengan kondisi LIKE
 

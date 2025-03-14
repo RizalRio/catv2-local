@@ -32,6 +32,15 @@
             text-decoration: none;
             background-color: lightgray;
         }
+
+        #terms-container {
+            overflow-y: auto;
+            min-height: 250px;
+            max-height: 500px;
+            border: 1px solid #ccc;
+            padding: 10px;
+            -webkit-overflow-scrolling: touch;
+        }
     </style>
 </head>
 
@@ -225,12 +234,37 @@
         const agreeCheckbox = document.getElementById('agree-checkbox');
         const continueButton = document.getElementById('continue-btn');
 
-        termContainer.addEventListener('scroll', () => {
-            if (termContainer.scrollTop + termContainer.clientHeight >= termContainer.scrollHeight) {
-                agreeCheckbox.disabled = false;
-            }
-        });
+        if (termContainer) {
+            // Scroll event listener
+            termContainer.addEventListener('scroll', () => {
+                const isScrolledToBottom =
+                    termContainer.scrollTop + termContainer.clientHeight >= termContainer.scrollHeight - 5; // Tolerance for margin error
+                if (isScrolledToBottom) {
+                    agreeCheckbox.disabled = false;
+                }
+            });
 
+            // Fallback using IntersectionObserver for compatibility
+            const observer = new IntersectionObserver(
+                (entries) => {
+                    entries.forEach((entry) => {
+                        if (entry.isIntersecting) {
+                            agreeCheckbox.disabled = false;
+                        }
+                    });
+                }, {
+                    root: termContainer,
+                    threshold: 1.0
+                } // 100% element visibility
+            );
+
+            const lastChild = termContainer.lastElementChild;
+            if (lastChild) {
+                observer.observe(lastChild);
+            }
+        }
+
+        // Agree checkbox event listener
         agreeCheckbox.addEventListener('change', () => {
             if (agreeCheckbox.checked) {
                 continueButton.classList.remove('disabled-link');
