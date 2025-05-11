@@ -95,7 +95,7 @@
     <ol>
       <?php if (isset($scoring['Minat Karir'])) : ?>
         <?php foreach ($scoring['Minat Karir']['development'] as $recommendations) : ?>
-          <li><?= $recommendations['development'] ?></li>
+          <li><?= $recommendations['development_recommendations'] ?></li>
         <?php endforeach; ?>
       <?php endif; ?>
     </ol>
@@ -103,7 +103,7 @@
     <ol>
       <?php if (isset($scoring['Kesiapan Kerja'])) : ?>
         <?php foreach ($scoring['Kesiapan Kerja']['recommendation'] as $key => $value) : ?>
-          <li><?= $value ?></li>
+          <li><?= $value['development_recommendations'] ?></li>
         <?php endforeach; ?>
       <?php endif; ?>
     </ol>

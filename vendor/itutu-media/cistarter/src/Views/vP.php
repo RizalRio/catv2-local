@@ -88,6 +88,22 @@
     </span>
   </div>
 
+  <div id="welcomeModal" class="modal fade" tabindex="-1" role="dialog" aria-labelledby="my-modal-title" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered" role="document">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="my-modal-title">Selamat Datang, <?= user()->fullname; ?> !</h5>
+          <button class="close" data-dismiss="modal" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+          </button>
+        </div>
+        <div class="modal-body">
+          <p>Lorem, ipsum dolor sit amet consectetur adipisicing elit. Voluptas rem corrupti expedita voluptates! Delectus, beatae. Id delectus nobis nisi accusamus quam alias aliquid hic deleniti unde, quidem nostrum enim soluta!</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
   <div class="modal fade" id="petunjukModal" tabindex="-1" aria-labelledby="petunjukModalLabel" aria-hidden="true" data-backdrop="static" data-keyboard="false">
     <div class="modal-dialog modal-dialog-centered">
       <div class="modal-content">
@@ -181,6 +197,29 @@
       echo script_tag($js);
     }
   } ?>
+  <script>
+    $(document).ready(function() {
+      // Mendapatkan slug terakhir dari URL saat ini
+      let url = window.location.href;
+      if (url.endsWith('/')) {
+        url = url.slice(0, -1); // Hilangkan '/' terakhir jika ada
+      }
+      const currentSlug = url.split('/').pop(); // Ambil slug terakhir
+
+      // Iterasi setiap link dalam navbar
+      $('.client-navbar a').each(function() {
+        const linkHref = $(this).attr('href'); // Ambil href dari elemen <a>
+        const linkSlug = linkHref.split('/').pop(); // Ambil slug dari href
+
+        // Cek apakah slug cocok
+        if (linkSlug === currentSlug) {
+          $(this).addClass('active'); // Tambahkan class 'active' jika cocok
+        } else {
+          $(this).removeClass('active'); // Hapus class 'active' jika tidak cocok
+        }
+      });
+    });
+  </script>
 </body>
 
 </html>

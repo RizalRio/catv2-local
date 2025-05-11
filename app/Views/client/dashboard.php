@@ -7,6 +7,68 @@
   </div>
   <div class="col-lg-9">
     <?= $message; ?>
+    <div class="row mb-4">
+      <div class="col-md-4 col-sm-12 mb-sm-3">
+        <div class="card card-custom card-stretch">
+          <div class="card-body text-center">
+            <div class="d-flex align-items-center justify-content-center flex-grow-1 h-100">
+              <div class="text-center">
+                <h1 class="text-dark-75 font-weight-bolder display-3 mb-2">
+                  <span class="badge badge-primary p-4">
+                    <?= count($tests); ?>
+                  </span>
+                </h1>
+                <p class="mt-4 font-size-lg font-weight-bold">
+                  Total Test
+                </p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="col-md-4 col-sm-12 mb-sm-3">
+        <div class="card card-custom card-stretch">
+          <div class="card-body text-center">
+            <div class="d-flex align-items-center justify-content-center flex-grow-1 h-100">
+              <div class="text-center">
+                <h1 class="text-dark-75 font-weight-bolder display-3 mb-2">
+                  <?php $filteredActive = array_filter($tests, function ($item) {
+                    return $item['status'] === "Active";
+                  }); ?>
+                  <span class="badge badge-warning p-4">
+                    <?= count($filteredActive); ?>
+                  </span>
+                </h1>
+                <p class="mt-4 font-size-lg font-weight-bold">
+                  Sedang Berjalan
+                </p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="col-md-4 col-sm-12 mb-sm-3">
+        <div class="card card-custom card-stretch">
+          <div class="card-body text-center">
+            <div class="d-flex align-items-center justify-content-center flex-grow-1 h-100">
+              <div class="text-center">
+                <h1 class="text-dark-75 font-weight-bolder display-3 mb-2">
+                  <?php $filteredDone = array_filter($tests, function ($item) {
+                    return $item['status'] === "Done";
+                  }); ?>
+                  <span class="badge badge-success p-4">
+                    <?= count($filteredDone); ?>
+                  </span>
+                </h1>
+                <p class="mt-4 font-size-lg font-weight-bold">
+                  Selesai
+                </p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
     <div class="row">
       <?php foreach ($tests as $test) : ?>
         <div class="col-lg-12 mb-3">

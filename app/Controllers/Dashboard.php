@@ -13,7 +13,7 @@ class Dashboard extends PublicController
 			throw \CodeIgniter\Exceptions\PageNotFoundException::forPageNotFound();
 	}
 
-	public function index()
+	private function getAllTests()
 	{
 		$mUsersTests = new \App\Models\M_users_tests();
 
@@ -24,13 +24,19 @@ class Dashboard extends PublicController
 			],
 			'order' => [['open', 'desc']]
 		];
-		$data = $mUsersTests->efektif($params);
+		return $mUsersTests->efektif($params);
+	}
+
+	public function index()
+	{
+		$data = $this->getAllTests();
 		foreach ($data['rows'] as $key => $value) {
 			$data['rows'][$key]['id'] = encryptUrl($data['rows'][$key]['id']);
 		}
 
 		$this->data['tests']   = $data['rows'];
 		$this->data['message'] = $this->im_message->get();
+		$this->data['js'] = ['assets/js/dashboard.min.js'];
 
 		$this->render('client/dashboard');
 	}
