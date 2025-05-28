@@ -231,12 +231,23 @@ class Orders extends AdminController
 				'field'    => $params['confirm_order']
 			];
 		}
+
+		/* $forms['file'] = [
+		 	'type'     => 'div',
+		 	'label'    => 'Bukti Transfer',
+		 	'name'     => 'file',
+		 	'field'    => (isset($params['file'])) ? '<a href="#" data-action="detail" data-nya="uploads/' . $params['username'] . '/' . $params['file'] . '">' . $params['file'] . '</a>' : ''
+		]; */
+
 		$forms['file'] = [
 			'type'     => 'div',
 			'label'    => 'Bukti Transfer',
 			'name'     => 'file',
-			'field'    => (isset($params['file'])) ? '<a href="#" data-action="detail" data-nya="payments/file/' . $params['username'] . '/' . $params['file'] . '">' . $params['file'] . '</a>' : ''
+			'field'    => (isset($params['file']) && isset($params['username']) && $params['file'])
+				? '<img src="' . base_url() . '/uploads/' . $params['username'] . '/' . $params['file'] . '" alt="Bukti Transfer" style="max-width: 80%; max-height: 80%;" />'
+				: '<div class="text-muted">Tidak ada bukti transfer</div>'
 		];
+
 		$forms['payment'] = [
 			'type'  => 'switch',
 			'label' => 'Confirm Payment',
@@ -249,6 +260,7 @@ class Orders extends AdminController
 				'tabindex' => ++$i,
 			]]
 		];
+
 		if (isset($params['confirm_payment'])) {
 			$forms['payment'] = [
 				'type'     => 'div',
@@ -257,7 +269,6 @@ class Orders extends AdminController
 				'field'    => $params['confirm_payment']
 			];
 		}
-
 
 		$this->data['form_open'] = ['class' => 'form', 'id' => 'kt_form'];
 		$this->data['btnSubmit'] = [
@@ -297,9 +308,9 @@ class Orders extends AdminController
 				$validation = null;
 		}
 
-		$this->data['pageTitle']  = 'Methods';
-		$this->data['title']      = 'Create Methods';
-		$this->data['breadCrumb'] = ['Dashboard' => 'support', 'Methods' => $this->module, 'Create' => 'create'];
+		$this->data['pageTitle']  = 'Orders';
+		$this->data['title']      = 'Create Orders';
+		$this->data['breadCrumb'] = ['Dashboard' => 'support', 'Orders' => $this->module, 'Create' => 'create'];
 
 		$this->data['forms'] = $this->_form([], $validation);
 		$this->data['js']    = ['assets/js/' . $this->module . '/form.min.js'];
@@ -386,9 +397,9 @@ class Orders extends AdminController
 				$validation = null;
 		}
 
-		$this->data['pageTitle']  = 'Methods';
-		$this->data['title']      = 'Edit Methods';
-		$this->data['breadCrumb'] = ['Dashboard' => 'support', 'Methods' => $this->module, 'Edit' => 'edit'];
+		$this->data['pageTitle']  = 'Orders';
+		$this->data['title']      = 'Edit Orders';
+		$this->data['breadCrumb'] = ['Dashboard' => 'support', 'Orders' => $this->module, 'Edit' => 'edit'];
 
 		$this->data['forms'] = $this->_form($data, $validation);
 		$this->data['js']    = ['assets/js/' . $this->module . '/form.min.js'];

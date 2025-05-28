@@ -473,6 +473,7 @@
       echo script_tag($js);
     }
   } ?>
+  <?= $this->renderSection('script') ?>
 </body>
 
 </html>
