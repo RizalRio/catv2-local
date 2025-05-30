@@ -12,7 +12,8 @@ class M_payments extends Modelku
 
   protected $kolom       = 'a.id, a.id no, a.invoice, a.active';
   protected $gabung      = [
-    ['orders b', 'b.invoice = a.invoice', '']
+    ['orders b', 'b.invoice = a.invoice', ''],
+    ['users_details c', 'b.user_id = c.user_id', '']
   ];
   protected $sama        = [];
   protected $grupSama    = [];

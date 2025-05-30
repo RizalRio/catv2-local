@@ -135,6 +135,7 @@ class Payments extends AdminController
 		helper(['form', 'text']);
 		$i = 0;
 		$forms = [];
+
 		$forms['id'] = [
 			'type' => 'hidden',
 			'name' => 'id',
@@ -142,63 +143,88 @@ class Payments extends AdminController
 				'id' => (isset($params['id'])) ? encryptUrl($params['id']) : ''
 			]
 		];
-		$forms['name'] = [
+
+		$forms['invoice'] = [
 			'type'     => 'input',
 			'required' => 'required',
-			'label'    => 'Name',
-			'name'     => 'name',
+			'label'    => 'Nomor Invoice',
+			'name'     => 'invoice',
 			'field'    => [
-				'class'       => (isset($validation)) ? ($validation->hasError('name') ? 'form-control is-invalid' : 'form-control is-valid') : 'form-control',
-				'name'        => 'name',
-				'id'          => 'name',
-				'placeholder' => 'Ex. Method 1',
-				'value'       => set_value('name', ($params['name']) ?? ''),
-				'maxlength'   => '100',
+				'class'       => (isset($validation)) ? ($validation->hasError('invoice') ? 'form-control is-invalid' : 'form-control is-valid') : 'form-control',
+				'name'        => 'invoice',
+				'id'          => 'invoice',
+				'value'       => set_value('invoice', (isset($params['invoice'])) ? $params['invoice'] : ''),
+				'maxlength'   => '12',
 				'tabindex'    => ++$i,
-				'autofocus'   => 'true'
+				'readonly'    => true
 			]
 		];
-		$forms['description'] = [
-			'type'     => 'textarea',
+
+		$forms['fullname'] = [
+			'type'     => 'div',
+			'label'    => 'Client',
+			'name'     => 'fullname',
+			'field'    => (isset($params['fullname'])) ? '<a href="#" data-action="detail" data-nya="clients/detail/' . encryptUrl($params['user_id']) . '">' . $params['fullname'] . '</a>' : ''
+		];
+
+		$forms['bill'] = [
+			'type'     => 'input',
 			'required' => 'required',
-			'label'    => 'Description',
-			'name'     => 'description',
+			'label'    => 'Biaya',
+			'name'     => 'bill',
 			'field'    => [
-				'class'       => (isset($validation)) ? ($validation->hasError('description') ? 'form-control is-invalid' : 'form-control is-valid') : 'form-control',
-				'name'        => 'description',
-				'id'          => 'description',
-				'placeholder' => 'Ex. Description Method 1',
-				'value'       => set_value('description', ($params['description']) ?? ''),
+				'class'       => (isset($validation)) ? ($validation->hasError('bill') ? 'form-control is-invalid' : 'form-control is-valid') : 'form-control',
+				'name'        => 'bill',
+				'id'          => 'bill',
+				'value'       => set_value('bill', (isset($params['bill'])) ? $params['bill'] : ''),
+				'maxlength'   => '12',
 				'tabindex'    => ++$i,
-				'rows'        => '2'
 			]
 		];
-		$forms['active'] = [
+
+		$forms['file'] = [
+			'type'     => 'div',
+			'label'    => 'Bukti Transfer',
+			'name'     => 'file',
+			'field'    => (isset($params['file']) && isset($params['username']) && $params['file'])
+				? '<img src="' . base_url() . '/uploads/' . $params['username'] . '/' . $params['file'] . '" alt="Bukti Transfer" style="max-width: 80%; max-height: 80%;" />'
+				: '<div class="text-muted">Tidak ada bukti transfer</div>'
+		];
+
+		/*
+		$forms['payment'] = [
 			'type'  => 'switch',
-			'label' => 'Active',
-			'name'  => 'active',
+			'label' => 'Confirm Payment',
+			'name'  => 'payment',
 			'style' => 'primary',
 			'fields' => [[
-				'name'     => 'active',
-				'id'       => 'active',
+				'name'     => 'payment',
+				'id'       => 'payment',
 				'value'    => '1',
 				'tabindex' => ++$i,
 			]]
 		];
+		*/
 
-		if ((isset($params['active']) && $params['active'] == 1) || empty($params))
-			$forms['active']['fields'][0]['checked'] = 'checked';
+		if (isset($params['confirm_payment'])) {
+			$forms['payment'] = [
+				'type'     => 'div',
+				'label'    => 'Confirm Payment',
+				'name'     => 'file',
+				'field'    => $params['confirm_payment']
+			];
+		}
 
 		$this->data['form_open'] = ['class' => 'form', 'id' => 'kt_form'];
 		$this->data['btnSubmit'] = [
 			'type'     => 'submit',
-			'class'    => 'btn btn-primary font-weight-bolder',
-			'content'  => '<i class="ki ki-check icon-sm"></i>Save Form</button>',
+			'class'    => 'btn btn-primary font-weight-bolder d-none',
+			'content'  => '<img class="ki ki-check icon-sm"></img>Save Form</button>',
 			'tabindex' => ++$i,
 		];
 		$this->data['btnReset'] = [
 			'type'     => 'reset',
-			'class'    => 'btn btn-dark font-weight-bolder',
+			'class'    => 'btn btn-dark font-weight-bolder d-none',
 			'content'  => '<i class="ki ki-round icon-sm"></i>Reset Form</button>',
 			'tabindex' => ++$i,
 		];
@@ -227,9 +253,9 @@ class Payments extends AdminController
 				$validation = null;
 		}
 
-		$this->data['pageTitle']  = 'Methods';
-		$this->data['title']      = 'Create Methods';
-		$this->data['breadCrumb'] = ['Dashboard' => 'support', 'Methods' => $this->module, 'Create' => 'create'];
+		$this->data['pageTitle']  = 'Payments';
+		$this->data['title']      = 'Create Payments';
+		$this->data['breadCrumb'] = ['Dashboard' => 'support', 'Payments' => $this->module, 'Create' => 'create'];
 
 		$this->data['forms'] = $this->_form([], $validation);
 		$this->data['js']    = ['assets/js/' . $this->module . '/form.min.js'];
@@ -238,7 +264,7 @@ class Payments extends AdminController
 
 	private function _getDetail($id)
 	{
-		return $this->model->baris($id, ['select' => 'a.id, a.invoice, a.file, a.active']);
+		return $this->model->baris($id, ['select' => ['a.id', 'a.invoice', 'b.user_id', 'd.username', 'c.fullname', 'b.bill', 'a.file', 'a.active'], 'join' => [['users d', 'd.id = c.user_id', 'left']]]);
 	}
 
 	public function edit($id)
@@ -289,9 +315,9 @@ class Payments extends AdminController
 				$validation = null;
 		}
 
-		$this->data['pageTitle']  = 'Methods';
-		$this->data['title']      = 'Edit Methods';
-		$this->data['breadCrumb'] = ['Dashboard' => 'support', 'Methods' => $this->module, 'Edit' => 'edit'];
+		$this->data['pageTitle']  = 'Payments';
+		$this->data['title']      = 'Edit Payments';
+		$this->data['breadCrumb'] = ['Dashboard' => 'support', 'Payments' => $this->module, 'Edit' => 'edit'];
 
 		$this->data['forms'] = $this->_form($data, $validation);
 		$this->data['js']    = ['assets/js/' . $this->module . '/form.min.js'];
