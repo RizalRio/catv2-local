@@ -99,8 +99,9 @@
         </div>
         <div class="modal-body">
           <p>Selamat datang di aplikasi tes psikologi. Aplikasi ini dirancang untuk membantu Anda lebih memahami diri dan potensi Anda melalui tes psikologi yang akurat dan mudah digunakan.
-
-            Silakan mulai dengan membuka menu <b>Pesanan Saya</b> untuk memilih tes yang Anda butuhkan. Kami siap membantu Anda dalam setiap langkah prosesnya. Selamat menggunakan aplikasi ini, dan semoga bermanfaat.</p>
+            <br>
+            Silakan mulai dengan membuka menu <b>Pesanan Saya</b> untuk memilih tes yang Anda butuhkan. Kami siap membantu Anda dalam setiap langkah prosesnya. Selamat menggunakan aplikasi ini, dan semoga bermanfaat.
+          </p>
         </div>
       </div>
     </div>
