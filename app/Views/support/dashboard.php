@@ -3,25 +3,42 @@
 <?= $this->section('content') ?>
 <div class="row">
   <div class="col-lg-7 mb-4">
-    <div class="card">
-      <div class="card-body">
-        <h4 class="header-title">Order Per Bulan</h4>
-        <div id="chart"></div>
+    <div class="row">
+      <div class="col-lg-12 mb-5">
+        <div class="card shadow-lg rounded-4">
+          <div class="card-header bg-primary text-white text-center rounded-top-4">
+            <h5 class="mb-0">Tes yang Sedang Berjalan</h5>
+          </div>
+          <div class="card-body py-4">
+            <div class="table-responsive">
+              <table class="table table-hover">
+                <thead>
+                  <tr>
+                    <th scope="col">Nama Peserta</th>
+                    <th scope="col">Tes yang Diambil</th>
+                    <th scope="col">Tanggal Diambil</th>
+                    <th scope="col">Tanggal Expired</th>
+                  </tr>
+                </thead>
+                <tbody id="activeTests">
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="col-lg-12 mb-5">
+        <div class="card">
+          <div class="card-body">
+            <h4 class="header-title">Order Per Bulan</h4>
+            <div id="chart"></div>
+          </div>
+        </div>
       </div>
     </div>
   </div>
   <div class="col-lg-5">
     <div class="row">
-      <div class="col-lg-12 mb-5">
-        <div class="card shadow-lg rounded-4">
-          <div class="card-header bg-primary text-white text-center rounded-top-4">
-            <h5 class="mb-0">User Test Information</h5>
-          </div>
-          <div class="card-body py-4">
-            <div id="donut-chart"></div>
-          </div>
-        </div>
-      </div>
       <div class="col-lg-12 mb-4">
         <div class="card shadow-lg rounded-4">
           <div class="card-header bg-primary text-white text-center rounded-top-4">
@@ -41,6 +58,16 @@
                 </tbody>
               </table>
             </div>
+          </div>
+        </div>
+      </div>
+      <div class="col-lg-12 mb-5">
+        <div class="card shadow-lg rounded-4">
+          <div class="card-header bg-primary text-white text-center rounded-top-4">
+            <h5 class="mb-0">User Test Information</h5>
+          </div>
+          <div class="card-body py-4">
+            <div id="donut-chart"></div>
           </div>
         </div>
       </div>

@@ -78,6 +78,29 @@ class Dashboard extends AdminController
 		return $this->response->setJSON($return);
 	}
 
+	public function getAllUserTestByStatus()
+	{
+		$status = $this->request->getVar('status');
+
+		$mUsersTests = new \App\Models\M_users_tests();
+
+		$params = [
+			'where' => [
+				['a.status', $status, 'AND'],
+				['b.open >=', date('Y-m-d'), 'AND'],
+				['b.close <=', date('Y-m-d'), 'AND']
+			],
+		];
+
+		$data = $mUsersTests->efektif($params);
+
+		foreach ($data['rows'] as $index => $row) {
+			$data['rows'][$index]['id'] = encryptUrl($row['id']);
+		}
+
+		return $this->response->setJSON($data);
+	}
+
 	public function index()
 	{
 		$mLogins = new \IM\CI\Models\App\M_authLogins();
