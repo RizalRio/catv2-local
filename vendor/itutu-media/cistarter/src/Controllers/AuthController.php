@@ -199,21 +199,21 @@ class AuthController extends GlobalController
 				[
 					'rules'	=>	'required|matches[password]'
 				],
-			]; 
+			];
 
 			if (!$this->validate($rules)) {
 				$errorMsg = lang('Register.errorValidation');
 
 				if (!empty(service('validation')->getError('cpassword')))
-				$errorMsg = service('validation')->getError('cpassword');
+					$errorMsg = service('validation')->getError('cpassword');
 				if (!empty(service('validation')->getError('password')))
-				$errorMsg = service('validation')->getError('password');
+					$errorMsg = service('validation')->getError('password');
 				if (!empty(service('validation')->getError('email')))
-				$errorMsg = service('validation')->getError('email');
+					$errorMsg = service('validation')->getError('email');
 				if (!empty(service('validation')->getError('username')))
-				$errorMsg = service('validation')->getError('username');
+					$errorMsg = service('validation')->getError('username');
 				if (!empty(service('validation')->getError('fullname')))
-				$errorMsg = service('validation')->getError('fullname');
+					$errorMsg = service('validation')->getError('fullname');
 
 				$this->data = [
 					'status'  => 401,
