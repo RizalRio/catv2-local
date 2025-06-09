@@ -237,7 +237,7 @@ class Tests extends AdminController
 				'name'        => 'time',
 				'id'          => 'time',
 				'placeholder' => 'Ex. 120',
-				'value'       => set_value('time', ($params['time'] / 60) ?? ''),
+				'value'       => set_value('time', (isset($params['time']) ? $params['time'] / 60 : '') ?? ''),
 				'maxlength'   => '6',
 				'tabindex'    => ++$i,
 			]
