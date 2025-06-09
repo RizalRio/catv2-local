@@ -32,6 +32,8 @@ class Configuration extends AdminController
 
         if ($postData['form'] == 'application') {
           setConfig(11, ['value' => $postData['penggunaan']], TRUE);
+          setConfig(13, ['value' => $postData['syarat']], TRUE);
+          setConfig(14, ['value' => $postData['ucapan']], TRUE);
         }
 
         if ($postData['form'] == 'test') {

@@ -28,6 +28,16 @@
           <h3>Petunjuk penggunaan</h3>
           <?= form_textarea(['class' => 'form-control summernote', 'name' => 'penggunaan', 'value' => getConfig('petunjukPenggunaan')]); ?>
         </div>
+        <br>
+        <div class="form-group">
+          <h3>Syarat dan ketentuan penggunaan</h3>
+          <?= form_textarea(['class' => 'form-control summernote', 'name' => 'syarat', 'value' => getConfig('syaratKetentuanPenggunaan')]); ?>
+        </div>
+        <br>
+        <div class="form-group">
+          <h3>Ucapan selamat datang</h3>
+          <?= form_textarea(['class' => 'form-control summernote', 'name' => 'ucapan', 'value' => getConfig('ucapanSelamatDatang')]); ?>
+        </div>
         <div class="form-group">
           <?= form_button(['type' => 'submit', 'class' => 'btn btn-primary font-weight-bolder btn-submit', 'content' => 'Simpan']); ?>
         </div>
