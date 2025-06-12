@@ -229,15 +229,15 @@ class Tests extends AdminController
 		$forms['time'] = [
 			'type'     => 'input',
 			'required' => 'required',
-			'label'    => 'Time (second)',
+			'label'    => 'Waktu (Menit)',
 			'name'     => 'time',
 			'field'    => [
 				'type'        => 'number',
 				'class'       => (isset($validation)) ? ($validation->hasError('time') ? 'form-control is-invalid' : 'form-control is-valid') : 'form-control',
 				'name'        => 'time',
 				'id'          => 'time',
-				'placeholder' => 'Ex. 7200',
-				'value'       => set_value('time', ($params['time']) ?? ''),
+				'placeholder' => 'Ex. 120',
+				'value'       => set_value('time', (isset($params['time']) ? $params['time'] / 60 : '') ?? ''),
 				'maxlength'   => '6',
 				'tabindex'    => ++$i,
 			]
@@ -318,6 +318,7 @@ class Tests extends AdminController
 
 			$date = explode(' / ', $postData['date']);
 
+			$newData['time']  = $postData['time'] * 60;
 			$newData['open']  = $date[0];
 			$newData['close'] = $date[1];
 
@@ -519,6 +520,9 @@ class Tests extends AdminController
 					}
 				}
 			}
+
+			$newData['time']  = $postData['time'] * 60;
+
 			if ($before) {
 				if ($this->request->getMethod() == 'post' && $this->model->ubah($id, $newData)) {
 					$this->im_message->add('success', "Data berhasil diperbarui");

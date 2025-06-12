@@ -3,6 +3,7 @@
 namespace App\Controllers\Support;
 
 use \IM\CI\Controllers\AdminController;
+use Mpdf\Tag\Tr;
 
 class Configuration extends AdminController
 {
@@ -31,10 +32,13 @@ class Configuration extends AdminController
 
         if ($postData['form'] == 'application') {
           setConfig(11, ['value' => $postData['penggunaan']], TRUE);
+          setConfig(13, ['value' => $postData['syarat']], TRUE);
+          setConfig(14, ['value' => $postData['ucapan']], TRUE);
         }
 
         if ($postData['form'] == 'test') {
           setConfig(8, ['value' => $postData['instruction']], TRUE);
+          setConfig(12, ['value' => $postData['terms']], TRUE);
         }
 
         if ($postData['form'] == 'report') {

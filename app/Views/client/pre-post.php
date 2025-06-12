@@ -74,13 +74,40 @@
                     <div class="col col-lg-12">
                       <div class="card">
                         <div class="card-header">
-                          <h3>Petunjuk Pelaksanaan</h3>
+                          <h3>Pre Test</h3>
                         </div>
                         <div class="card-body">
-                          <?= getConfig('generalInstruction'); ?>
+                          <div class="">
+                            <?= getConfig('generalInstruction'); ?>
+                          </div>
+                          <div class="mt-4">
+                            <h5>Contoh Pengerjaan Soal :</h5>
+                            <div class="card-body" id="main-sheet">
+                              <div class="row mb-3">
+                                <div class="col">
+                                  <p><span class="label label-square label-dark label-inline font-weight-bold p-5 font-size-h3">No. Soal:</span><span class="label label-square label-secondary label-inline font-weight-bold p-5 font-size-h3" id="timer">1</span></p>
+                                  <p>Pilihlah salah satu dari sepasang item berikut yang paling menggambarkan diri Anda:</p>
+                                </div>
+                              </div>
+                              <div class="d-flex justify-content-start my-2">
+                                <label class="radio radio-outline radio-outline-2x radio-success">
+                                  <input type="radio" name="answer" value="1">
+                                  <span class="mx-2"></span>
+                                  Pilihan 1
+                                </label>
+                              </div>
+                              <div class="d-flex justify-content-start my-2">
+                                <label class="radio radio-outline radio-outline-2x radio-success">
+                                  <input type="radio" name="answer" value="2">
+                                  <span class="mx-2"></span>
+                                  Pilihan 2
+                                </label>
+                              </div>
+                            </div>
+                          </div>
                         </div>
                         <div class="card-footer d-flex justify-content-between">
-                          <a href="<?= site_url('test/pause/' . encryptUrl($id) . '?goto=room/' . encryptUrl($test_id) . '&state=Active'); ?>" class="btn btn-light-danger font-weight-bold">Batal</a>
+                          <a href="<?= site_url('test/pause/' . encryptUrl($id) . '?goto=dashboard/&state=Active'); ?>" class="btn btn-light-danger font-weight-bold">Batal</a>
                           <a href="<?= site_url('test/do/' . encryptUrl($id)); ?>" class="btn btn-light-primary font-weight-bold">Mulai</a>
                         </div>
                       </div>
@@ -99,7 +126,7 @@
                           Terima kasih telah mengikuti tes.
                         </div>
                         <div class="card-footer d-flex justify-content-end">
-                          <a href="<?= site_url('dashboard'); ?>" class="btn btn-light-primary font-weight-bold">DASHBOARD</a>
+                          <a href="<?= site_url('dashboard'); ?>" class="btn btn-light-primary font-weight-bold mr-2">DASHBOARD</a>
                           <a href="<?= site_url('logout'); ?>" class="btn btn-danger font-weight-bold">LOGOUT</a>
                         </div>
                       </div>

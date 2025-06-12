@@ -7,7 +7,10 @@
   </div>
   <div class="col-lg-9">
     <div class="row">
-      <?php foreach ($tests as $test) : ?>
+      <?php $filteredNotDone = array_filter($tests, function ($item) {
+        return $item['status'] !== "Done";
+      }); ?>
+      <?php foreach ($filteredNotDone as $test) : ?>
         <div class="col-lg-12 mb-3">
           <div class="card card-custom card-stretch">
             <div class="card-header border-0">
@@ -21,11 +24,11 @@
                 elseif ((date('Y-m-d') >= $test['open']) && (date('Y-m-d') <= $test['close'])) :
                 ?>
                   <?php if ($test['status'] == 'Active' || $test['status'] == 'Ready') : ?>
-                    <a href="<?= site_url('test/instruction/' . ($test['id'])); ?>" class="btn btn-success font-weight-bolder font-size-sm">
+                    <a href="<?= site_url('test/term/' . ($test['id'])); ?>" class="btn btn-success font-weight-bolder font-size-sm">
                       Kerjakan
                     </a>
                   <?php elseif ($test['status'] == 'Ongoing' || $test['status'] == 'Pause') : ?>
-                    <a href="<?= site_url('test/instruction/' . ($test['id'])); ?>" class="btn btn-warning font-weight-bolder font-size-sm">
+                    <a href="<?= site_url('test/term/' . ($test['id'])); ?>" class="btn btn-warning font-weight-bolder font-size-sm">
                       Lanjutkan
                     </a>
                   <?php elseif ($test['status'] == 'Done') : ?>
@@ -46,7 +49,7 @@
                   <div class="d-flex flex-column align-items-cente py-2 w-75">
                     <span class="text-dark-75 font-weight-bold font-size-lg mb-1"><?= $test['description']; ?></span>
                     <span class="text-dark-75 font-weight-bold"><?= tanggal($test['open'], 'dd MMMM yyyy') . ' s.d. ' . tanggal($test['close'], 'dd MMMM yyyy'); ?></span>
-                    <span class="text-dark-75 font-weight-bold"><?= $test['time'] . ' menit'; ?></span>
+                    <span class="text-dark-75 font-weight-bold"><?= $test['time'] / 60 . ' menit'; ?></span>
                   </div>
                 </div>
               </div>

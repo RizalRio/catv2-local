@@ -243,6 +243,9 @@ class Modelku extends Model
     if (is_numeric($id))
       $query->where('a.' . $this->primaryKey, $id);
 
+    if (is_string($id))
+      $query->where('a.' . $this->primaryKey, $id);
+
     if (is_array($id)) {
       foreach ($id as $id) {
         $query->where($id[0], $id[1]);

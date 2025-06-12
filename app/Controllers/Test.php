@@ -3,6 +3,7 @@
 namespace App\Controllers;
 
 use DateTime;
+use Exception;
 use \IM\CI\Controllers\PublicController;
 use stdClass;
 
@@ -58,6 +59,23 @@ class Test extends PublicController
 			}
 
 			return redirect()->to(site_url('test/instruction/' . encryptUrl($userTestID)));
+		} catch (\Exception $e) {
+			$this->render('client/error');
+		}
+	}
+
+	public function term($id)
+	{
+		try {
+			$id 			= decryptUrl($id);
+			$mUsersTests	= new \App\Models\M_users_tests();
+			$mUsersTests->ubah($id, ['status' => 'Ready']);
+			$userTest 		= $mUsersTests->baris($id);
+
+			$this->data['id']		= $id;
+			$this->data['test_id']	= $userTest['test_id'];
+			$this->data['content'] 	= 'pre';
+			$this->render('client/term');
 		} catch (\Exception $e) {
 			$this->render('client/error');
 		}
@@ -119,7 +137,7 @@ class Test extends PublicController
 
 			$minute = $test['time'] / 60;
 			$startTime = date('Y-m-d H:i:s');
-			$endTime   = date('Y-m-d H:i:s', strtotime('+' . $minute. ' minutes', strtotime($startTime)));
+			$endTime   = date('Y-m-d H:i:s', strtotime('+' . $minute . ' minutes', strtotime($startTime)));
 
 			$questions = explode(',', $test['question']);
 			$answers = new stdClass();

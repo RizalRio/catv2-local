@@ -11,7 +11,7 @@ class Account extends GlobalController
 	private function _getDetail($id)
 	{
 		$mUserDetail = new \IM\CI\Models\App\M_userDetail();
-		return $mUserDetail->baris($id, ['select' => 'a.user_id, fullname, address, phone, concentration, purpose, complete_reg, email, username, avatar']);
+		return $mUserDetail->baris($id, ['select' => 'a.user_id, fullname, address, phone, age, education, experience, gender, duration, concentration, purpose, complete_reg, email, username, avatar']);
 	}
 
 	public function index()
@@ -168,6 +168,61 @@ class Account extends GlobalController
 			]
 		];
 		if (has_permission('manage') || in_groups('IM')) {
+			$forms['age'] = [
+				'type'     => 'input',
+				'name'     => 'age',
+				'field'    => [
+					'type'  => 'hidden',
+					'class' => 'form-control',
+					'name'  => 'age',
+					'id'    => 'age',
+					'value' => '-',
+				]
+			];
+			$forms['gender'] = [
+				'type'     => 'input',
+				'name'     => 'gender',
+				'field'    => [
+					'type'  => 'hidden',
+					'class' => 'form-control',
+					'name'  => 'gender',
+					'id'    => 'gender',
+					'value' => '-',
+				]
+			];
+			$forms['education'] = [
+				'type'     => 'input',
+				'name'     => 'education',
+				'field'    => [
+					'type'  => 'hidden',
+					'class' => 'form-control',
+					'name'  => 'education',
+					'id'    => 'education',
+					'value' => '-',
+				]
+			];
+			$forms['experience'] = [
+				'type'     => 'input',
+				'name'     => 'experience',
+				'field'    => [
+					'type'  => 'hidden',
+					'class' => 'form-control',
+					'name'  => 'experience',
+					'id'    => 'experience',
+					'value' => '-',
+				]
+			];
+			$forms['duration'] = [
+				'type'     => 'input',
+				'name'     => 'duration',
+				'field'    => [
+					'type'  => 'hidden',
+					'class' => 'form-control',
+					'name'  => 'duration',
+					'id'    => 'duration',
+					'value' => '-',
+				]
+			];
 			$forms['concentration'] = [
 				'type'     => 'input',
 				'name'     => 'concentration',
@@ -191,6 +246,81 @@ class Account extends GlobalController
 				]
 			];
 		} else {
+			$forms['age'] = [
+				'type' => 'input',
+				'required' => 'required',
+				'label' => 'Usia',
+				'name' => 'age',
+				'field' => [
+					'class' 		=> (isset($validation)) ? ($validation->hasError('age') ? 'form-control is-invalid' : 'form-control is-valid') : 'form-control',
+					'name' 			=> 'age',
+					'id'			=> 'age',
+					'placeholder'	=> 'Ex. 19',
+					'value'			=> set_value('age', (user()->age) ?? ''),
+					'maxlength'		=> '3',
+					'tabindex'		=> ++$i
+				]
+			];
+			$forms['gender'] = [
+				'type'     => 'dropdown',
+				'required' => 'required',
+				'label'    => 'Jenis Kelamin',
+				'name'     => 'gender',
+				'field'    => [
+					'class'   => 'form-control filter-input',
+					'name'    => 'gender',
+					'options' => [
+						''           => 'Pilih Jenis Kelamin',
+						'L'  => 'Laki - Laki',
+						'P' => 'Perempuan',
+						'R'     => 'Rahasia'
+					],
+					'selected' => user()->gender
+				]
+			];
+			$forms['education'] = [
+				'type'		=> 'input',
+				'required'	=> 'required',
+				'label'		=> 'Pendidikan Terakhir',
+				'name'		=> 'education',
+				'field'		=> [
+					'class'			=> (isset($validation)) ? ($validation->hasError('education') ? 'form-control is-invalid' : 'form-control is-valid') : 'form-control',
+					'name'			=> 'education',
+					'id'			=> 'education',
+					'placeholder'	=> 'Ex. SMA/SMK',
+					'value'			=> set_value('education', (user()->education) ?? ''),
+					'tabindex'		=> ++$i
+				]
+			];
+			$forms['experience'] = [
+				'type'		=> 'input',
+				'required'	=> 'required',
+				'label'		=> 'Pengalaman Kerja',
+				'name'		=> 'experience',
+				'field'		=> [
+					'class' 		=> (isset($validation)) ? ($validation->hasError('experience') ? 'form-control is-invalid' : 'form-control is-valid') : 'form-control',
+					'name'			=> 'experience',
+					'id'			=> 'experience',
+					'placeholder'	=> 'Ex. Admin',
+					'value'			=> set_value('experience', (user()->experience) ?? ''),
+					'tabindex'		=> ++$i
+				]
+			];
+			$forms['duration'] = [
+				'type'		=> 'input',
+				'required'	=> 'required',
+				'label'		=> 'Pengalaman Kerja',
+				'name'		=> 'duration',
+				'field'		=> [
+					'class' 		=> (isset($validation)) ? ($validation->hasError('duration') ? 'form-control is-invalid' : 'form-control is-valid') : 'form-control',
+					'name'			=> 'duration',
+					'id'			=> 'duration',
+					'placeholder'	=> 'Ex. Admin',
+					'value'			=> set_value('duration', (user()->duration) ?? ''),
+					'tabindex'		=> ++$i
+				]
+			];
+			
 			$forms['concentration'] = [
 				'type'     => 'dropdown',
 				'required' => 'required',
@@ -344,6 +474,11 @@ class Account extends GlobalController
 			'fullname'      => 'required',
 			'address'       => 'required',
 			'phone'         => 'required',
+			'age'			=> 'required',
+			'gender'		=> 'required',
+			'education'		=> 'required',
+			'experience'	=> 'required',
+			'duration' 		=> 'required', 
 			'concentration' => 'required',
 			'purpose'       => 'required',
 		])) {
@@ -353,7 +488,7 @@ class Account extends GlobalController
 		$postData = $this->request->getPost();
 
 		$mUserDetail = new \IM\CI\Models\App\M_userDetail();
-		$user = $mUserDetail->baris(decryptUrl($postData['id']), ['select' => 'a.user_id, fullname, address, phone, concentration, purpose, complete_reg, email, username, avatar']);
+		$user = $mUserDetail->baris(decryptUrl($postData['id']), ['select' => 'a.user_id, fullname, address, phone, age, gender, education, experience, duration, concentration, purpose, complete_reg, email, username, avatar']);
 
 		if (is_null($user))
 			$this->ajaxResponse(FALSE, 'Account tidak ditemukan');
@@ -364,6 +499,11 @@ class Account extends GlobalController
 			'fullname'      => 'fullname',
 			'address'       => 'address',
 			'phone'         => 'phone',
+			'age'			=> 'age',
+			'gender'		=> 'gender',
+			'experience'	=> 'experience',
+			'duration' 		=> 'duration', 
+			'education'		=> 'education',
 			'concentration' => 'concentration',
 			'purpose'       => 'purpose',
 		];

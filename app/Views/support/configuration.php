@@ -28,6 +28,16 @@
           <h3>Petunjuk penggunaan</h3>
           <?= form_textarea(['class' => 'form-control summernote', 'name' => 'penggunaan', 'value' => getConfig('petunjukPenggunaan')]); ?>
         </div>
+        <br>
+        <div class="form-group">
+          <h3>Syarat dan ketentuan penggunaan</h3>
+          <?= form_textarea(['class' => 'form-control summernote', 'name' => 'syarat', 'value' => getConfig('syaratKetentuanPenggunaan')]); ?>
+        </div>
+        <br>
+        <div class="form-group">
+          <h3>Ucapan selamat datang</h3>
+          <?= form_textarea(['class' => 'form-control summernote', 'name' => 'ucapan', 'value' => getConfig('ucapanSelamatDatang')]); ?>
+        </div>
         <div class="form-group">
           <?= form_button(['type' => 'submit', 'class' => 'btn btn-primary font-weight-bolder btn-submit', 'content' => 'Simpan']); ?>
         </div>
@@ -36,6 +46,11 @@
       <div class="tab-pane fade" id="test" role="tabpanel" aria-labelledby="test-tab">
         <?= form_open('#', ['class' => 'form repeater', 'id' => 'form-fakultas']); ?>
         <?= form_hidden('form', 'test'); ?>
+        <div class="form-group">
+          <h3>Terms and conditions</h3>
+          <?= form_textarea(['class' => 'form-control summernote', 'name' => 'terms', 'value' => getConfig('termsConditions')]); ?>
+        </div>
+        <br>
         <div class="form-group">
           <h3>Intruksi umum</h3>
           <?= form_textarea(['class' => 'form-control summernote', 'name' => 'instruction', 'value' => getConfig('generalInstruction')]); ?>
@@ -52,6 +67,7 @@
           <h3>Bagaimana Titian Karir dapat membantu Anda</h3>
           <?= form_textarea(['class' => 'form-control summernote', 'name' => 'how', 'value' => getConfig('bagaimana')]); ?>
         </div>
+        <br>
         <div class="form-group">
           <h3>Deskripsi hasil test</h3>
           <?= form_textarea(['class' => 'form-control summernote', 'name' => 'desc', 'value' => getConfig('deskripsiLaporan')]); ?>

@@ -25,7 +25,7 @@
 												</svg>
 											</span>
 										</span>
-										<span class="nav-text font-size-lg">Personal Info</span>
+										<span class="nav-text font-size-lg">Data Diri</span>
 									</a>
 								</li>
 								<li class="nav-item mr-3">
@@ -41,7 +41,7 @@
 												</svg>
 											</span>
 										</span>
-										<span class="nav-text font-size-lg">Account</span>
+										<span class="nav-text font-size-lg">Akun</span>
 									</a>
 								</li>
 								<li class="nav-item mr-3">
@@ -58,7 +58,7 @@
 												</svg>
 											</span>
 										</span>
-										<span class="nav-text font-size-lg">Change Password</span>
+										<span class="nav-text font-size-lg">Ubah Password</span>
 									</a>
 								</li>
 							</ul>

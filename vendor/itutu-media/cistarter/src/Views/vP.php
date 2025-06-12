@@ -88,99 +88,160 @@
     </span>
   </div>
 
-  <div class="modal fade" id="petunjukModal" tabindex="-1" aria-labelledby="petunjukModalLabel" aria-hidden="true" data-backdrop="static" data-keyboard="false">
-    <div class="modal-dialog modal-dialog-centered">
-      <div class="modal-content">
-        <div class="modal-header">
-          <h5 class="modal-title" id="exampleModalLabel">Petunjuk Penggunaan</h5>
-          <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-            <span aria-hidden="true">&times;</span>
-          </button>
-        </div>
-        <div class="modal-body">
-          <?= getConfig('petunjukPenggunaan') ?>
-        </div>
-        <div class="modal-footer">
-          <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+  <?php if (!isset($_COOKIE['persetujuanPenggunaan'])) : ?>
+    <div id="welcomeModal" class="modal fade" tabindex="-1" role="dialog" aria-labelledby="welcomeModal" aria-hidden="true" data-backdrop="static" data-keyboard="false">
+    <?php else : ?>
+      <div id="welcomeModal" class="modal fade" tabindex="-1" role="dialog" aria-labelledby="welcomeModal" aria-hidden="true">
+      <?php endif; ?>
+      <div class="modal-dialog modal-dialog-centered modal-lg" role="document">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title" id="my-modal-title">Selamat Datang, <?= user()->fullname; ?> !</h5>
+            <button class="close" data-dismiss="modal" aria-label="Close">
+              <span aria-hidden="true">&times;</span>
+            </button>
+          </div>
+
+          <?php if (!isset($_COOKIE['persetujuanPenggunaan'])) : ?>
+            <div class="modal-body">
+              <div style="height: 400px; overflow-y: scroll;">
+                <?= getConfig('syaratKetentuanPenggunaan') ?>
+              </div>
+            </div>
+          <?php else : ?>
+            <div class="modal-body">
+              <?= getConfig('ucapanSelamatDatang') ?>
+            </div>
+          <?php endif; ?>
+          <div class="modal-footer">
+            <?php if (!isset($_COOKIE['persetujuanPenggunaan'])) : ?>
+              <button class="btn btn-danger font-weight-bold" data-dismiss="modal" aria-label="Close">Tutup</button>
+              <button class="btn btn-primary font-weight-bold" id="setujuBtn">Setuju</button>
+            <?php else : ?>
+              <button class="btn btn-primary font-weight-bold" data-dismiss="modal" aria-label="Close">Tutup</button>
+            <?php endif; ?>
+          </div>
         </div>
       </div>
-    </div>
-  </div>
+      </div>
 
-  <script>
-    var HOST_URL = "<?= current_url(); ?>";
-    var BASE_URL = "<?= base_url(); ?>";
-  </script>
+      <div class="modal fade" id="petunjukModal" tabindex="-1" aria-labelledby="petunjukModalLabel" aria-hidden="true" data-backdrop="static" data-keyboard="false">
+        <div class="modal-dialog modal-lg modal-dialog-centered">
+          <div class="modal-content">
+            <div class="modal-header">
+              <h5 class="modal-title" id="exampleModalLabel">Petunjuk Penggunaan</h5>
+              <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                <span aria-hidden="true">&times;</span>
+              </button>
+            </div>
+            <div class="modal-body">
+              <?= getConfig('petunjukPenggunaan') ?>
+            </div>
+            <div class="modal-footer">
+              <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+            </div>
+          </div>
+        </div>
+      </div>
 
-  <script>
-    var KTAppSettings = {
-      "breakpoints": {
-        "sm": 576,
-        "md": 768,
-        "lg": 992,
-        "xl": 1200,
-        "xxl": 1400
-      },
-      "colors": {
-        "theme": {
-          "base": {
-            "white": "#ffffff",
-            "primary": "#3699FF",
-            "secondary": "#E5EAEE",
-            "success": "#1BC5BD",
-            "info": "#8950FC",
-            "warning": "#FFA800",
-            "danger": "#F64E60",
-            "light": "#E4E6EF",
-            "dark": "#181C32"
+      <script>
+        var HOST_URL = "<?= current_url(); ?>";
+        var BASE_URL = "<?= base_url(); ?>";
+      </script>
+
+      <script>
+        var KTAppSettings = {
+          "breakpoints": {
+            "sm": 576,
+            "md": 768,
+            "lg": 992,
+            "xl": 1200,
+            "xxl": 1400
           },
-          "light": {
-            "white": "#ffffff",
-            "primary": "#E1F0FF",
-            "secondary": "#EBEDF3",
-            "success": "#C9F7F5",
-            "info": "#EEE5FF",
-            "warning": "#FFF4DE",
-            "danger": "#FFE2E5",
-            "light": "#F3F6F9",
-            "dark": "#D6D6E0"
+          "colors": {
+            "theme": {
+              "base": {
+                "white": "#ffffff",
+                "primary": "#3699FF",
+                "secondary": "#E5EAEE",
+                "success": "#1BC5BD",
+                "info": "#8950FC",
+                "warning": "#FFA800",
+                "danger": "#F64E60",
+                "light": "#E4E6EF",
+                "dark": "#181C32"
+              },
+              "light": {
+                "white": "#ffffff",
+                "primary": "#E1F0FF",
+                "secondary": "#EBEDF3",
+                "success": "#C9F7F5",
+                "info": "#EEE5FF",
+                "warning": "#FFF4DE",
+                "danger": "#FFE2E5",
+                "light": "#F3F6F9",
+                "dark": "#D6D6E0"
+              },
+              "inverse": {
+                "white": "#ffffff",
+                "primary": "#ffffff",
+                "secondary": "#3F4254",
+                "success": "#ffffff",
+                "info": "#ffffff",
+                "warning": "#ffffff",
+                "danger": "#ffffff",
+                "light": "#464E5F",
+                "dark": "#ffffff"
+              }
+            },
+            "gray": {
+              "gray-100": "#F3F6F9",
+              "gray-200": "#EBEDF3",
+              "gray-300": "#E4E6EF",
+              "gray-400": "#D1D3E0",
+              "gray-500": "#B5B5C3",
+              "gray-600": "#7E8299",
+              "gray-700": "#5E6278",
+              "gray-800": "#3F4254",
+              "gray-900": "#181C32"
+            }
           },
-          "inverse": {
-            "white": "#ffffff",
-            "primary": "#ffffff",
-            "secondary": "#3F4254",
-            "success": "#ffffff",
-            "info": "#ffffff",
-            "warning": "#ffffff",
-            "danger": "#ffffff",
-            "light": "#464E5F",
-            "dark": "#ffffff"
-          }
-        },
-        "gray": {
-          "gray-100": "#F3F6F9",
-          "gray-200": "#EBEDF3",
-          "gray-300": "#E4E6EF",
-          "gray-400": "#D1D3E0",
-          "gray-500": "#B5B5C3",
-          "gray-600": "#7E8299",
-          "gray-700": "#5E6278",
-          "gray-800": "#3F4254",
-          "gray-900": "#181C32"
+          "font-family": "Poppins"
+        };
+      </script>
+      <?= script_tag('assets/plugins/global/plugins.bundle.min.js'); ?>
+      <?= script_tag('assets/plugins/custom/prismjs/prismjs.bundle.min.js'); ?>
+      <?= script_tag('assets/js/scripts.bundle.min.js'); ?>
+      <?= script_tag('assets/js/main.min.js'); ?>
+      <?= script_tag('assets/js/client.min.js'); ?>
+      <?php if ($js) {
+        foreach ($js as $js) {
+          echo script_tag($js);
         }
-      },
-      "font-family": "Poppins"
-    };
-  </script>
-  <?= script_tag('assets/plugins/global/plugins.bundle.min.js'); ?>
-  <?= script_tag('assets/plugins/custom/prismjs/prismjs.bundle.min.js'); ?>
-  <?= script_tag('assets/js/scripts.bundle.min.js'); ?>
-  <?= script_tag('assets/js/main.min.js'); ?>
-  <?php if ($js) {
-    foreach ($js as $js) {
-      echo script_tag($js);
-    }
-  } ?>
+      } ?>
+      <script>
+        $(document).ready(function() {
+          // Mendapatkan slug terakhir dari URL saat ini
+          let url = window.location.href;
+          if (url.endsWith('/')) {
+            url = url.slice(0, -1); // Hilangkan '/' terakhir jika ada
+          }
+          const currentSlug = url.split('/').pop(); // Ambil slug terakhir
+
+          // Iterasi setiap link dalam navbar
+          $('.client-navbar a').each(function() {
+            const linkHref = $(this).attr('href'); // Ambil href dari elemen <a>
+            const linkSlug = linkHref.split('/').pop(); // Ambil slug dari href
+
+            // Cek apakah slug cocok
+            if (linkSlug === currentSlug) {
+              $(this).addClass('active'); // Tambahkan class 'active' jika cocok
+            } else {
+              $(this).removeClass('active'); // Hapus class 'active' jika tidak cocok
+            }
+          });
+        });
+      </script>
 </body>
 
 </html>

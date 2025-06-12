@@ -90,7 +90,8 @@ class Lists extends ApiController
 
       $tests = $this->model->efektif([
         'select' => ['a.id user_test', 'b.name', 'b.description', 'a.status', 'a.start', 'a.end', 'time', 'open', 'close'],
-        'where' => [['a.user_id', $userID, 'AND']], 'order' => [['open', 'desc']]
+        'where' => [['a.user_id', $userID, 'AND']],
+        'order' => [['open', 'desc']]
       ]);
 
       foreach ($tests['rows'] as $key => $value) {

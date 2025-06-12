@@ -4,6 +4,8 @@ namespace App\Controllers;
 
 use \IM\CI\Controllers\PublicController;
 
+use function PHPSTORM_META\map;
+
 class Accounts extends PublicController
 {
 	protected $module = 'account';
@@ -55,10 +57,42 @@ class Accounts extends PublicController
 				'class'       => (isset($validation)) ? ($validation->hasError('fullname') ? 'form-control is-invalid' : 'form-control is-valid') : 'form-control',
 				'name'        => 'fullname',
 				'id'          => 'fullname',
-				'placeholder' => 'Ex. Method 1',
+				'placeholder' => 'Ex. Name 1',
 				'value'       => set_value('fullname', (user()->fullname) ?? ''),
 				'maxlength'   => '100',
 				'tabindex'    => ++$i,
+			]
+		];
+		$forms['age'] = [
+			'type' => 'input',
+			'required' => 'required',
+			'label' => 'Usia',
+			'name' => 'age',
+			'field' => [
+				'class' 		=> (isset($validation)) ? ($validation->hasError('age') ? 'form-control is-invalid' : 'form-control is-valid') : 'form-control',
+				'name' 			=> 'age',
+				'id'			=> 'age',
+				'placeholder'	=> 'Ex. 19',
+				'value'			=> set_value('age', (user()->age) ?? ''),
+				'maxlength'		=> '3',
+				'tabindex'		=> ++$i
+			]
+		];
+		$forms['gender'] = [
+			'type'     => 'dropdown',
+			'required' => 'required',
+			'label'    => 'Jenis Kelamin',
+			'name'     => 'gender',
+			'field'    => [
+				'class'   => 'form-control filter-input',
+				'name'    => 'gender',
+				'options' => [
+					''           => 'Pilih Jenis Kelamin',
+					'L'  => 'Laki - Laki',
+					'P' => 'Perempuan',
+					'R'     => 'Rahasia'
+				],
+				'selected' => user()->gender
 			]
 		];
 		$forms['address'] = [
@@ -74,6 +108,34 @@ class Accounts extends PublicController
 				'value'       => set_value('address', (user()->address) ?? ''),
 				'tabindex'    => ++$i,
 				'rows'        => '2'
+			]
+		];
+		$forms['education'] = [
+			'type'		=> 'input',
+			'required'	=> 'required',
+			'label'		=> 'Pendidikan Terakhir',
+			'name'		=> 'education',
+			'field'		=> [
+				'class'			=> (isset($validation)) ? ($validation->hasError('address') ? 'form-control is-invalid' : 'form-control is-valid') : 'form-control',
+				'name'			=> 'education',
+				'id'			=> 'education',
+				'placeholder'	=> 'Ex. SMA/SMK',
+				'value'			=> set_value('education', (user()->education) ?? ''),
+				'tabindex'		=> ++$i
+			]
+		];
+		$forms['experience'] = [
+			'type'		=> 'input',
+			'required'	=> 'required',
+			'label'		=> 'Pengalaman Kerja',
+			'name'		=> 'experience',
+			'field'		=> [
+				'class' 		=> (isset($validation)) ? ($validation->hasError('address') ? 'form-control is-invalid' : 'form-control is-valid') : 'form-control',
+				'name'			=> 'experience',
+				'id'			=> 'experience',
+				'placeholder'	=> 'Ex. Admin',
+				'value'			=> set_value('experience', (user()->experience) ?? ''),
+				'tabindex'		=> ++$i
 			]
 		];
 		$forms['phone'] = [

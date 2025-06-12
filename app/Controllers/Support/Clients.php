@@ -383,7 +383,7 @@ class Clients extends AdminController
 		];
 
 		$params['where'] = $where;
-		
+
 		if (isset($query['multiple'])) {
 			$fields = [
 				'name'        => 'name',

@@ -30,7 +30,7 @@ class M_userDetail extends Modelku
     ['fullname', 'asc']
   ];
 
-  protected $theFields = ['user_id', 'fullname', 'address', 'phone', 'concentration', 'purpose', 'complete_reg'];
+  protected $theFields = ['user_id', 'fullname', 'address', 'phone', 'age', 'gender', 'education', 'experience', 'duration','concentration', 'purpose', 'complete_reg'];
 
   protected $validationRules    = [];
   protected $validationMessages = [];

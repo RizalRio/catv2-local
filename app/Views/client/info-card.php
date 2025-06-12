@@ -8,6 +8,8 @@
       <h4 class="font-weight-bold my-2" id="fullname"><?= user()->fullname; ?></h4>
       <div class="text-muted mb-2" id="email"><?= user()->email; ?></div>
     </div>
-    <?= $sidebar; ?>
+    <div class="client-navbar">
+      <?= $sidebar; ?>
+    </div>
   </div>
 </div>
