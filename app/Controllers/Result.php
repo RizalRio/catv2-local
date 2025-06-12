@@ -232,8 +232,11 @@ class Result extends GlobalController
 						}
 						array_push($dimCheck, $answersDimension);
 						array_push($scoring[$answersMethod]['data'][$answersDimension]['point'], $userAnswers['point']);
+
 						$scoring[$answersMethod]['data'][$answersDimension]['total'] += $userAnswers['point'];
+
 						$total = $scoring[$answersMethod]['data'][$answersDimension]['total'];
+
 						$scoring[$answersMethod]['data'][$answersDimension]['percentage'] = round(($total / count($scoring[$answersMethod]['data'][$answersDimension]['point'])) * 100);
 					} elseif ($answersMethod == "Self Efficacy" || $answersMethod == "Kesiapan Kerja") {
 						if (!isset($scoring[$answersMethod]['data'][$answersDimension])) {
@@ -241,8 +244,10 @@ class Result extends GlobalController
 						}
 						array_push($scoring[$answersMethod]['data'][$answersDimension]['point'], $userAnswers['point']);
 						$scoring[$answersMethod]['data'][$answersDimension]['total_point'] += $userAnswers['point'];
+
 						$total_point = $scoring[$answersMethod]['data'][$answersDimension]['total_point'];
 						$countAnswer = count($scoring[$answersMethod]['data'][$answersDimension]['point']);
+
 						$scoring[$answersMethod]['data'][$answersDimension]['value'] = $total_point / $countAnswer;
 						$scoring[$answersMethod]['data'][$answersDimension]['max_point'] = $countAnswer * 5;
 						$scoring[$answersMethod]['data'][$answersDimension]['percentage'] = round(($total_point / $scoring[$answersMethod]['data'][$answersDimension]['max_point']) * 100);
@@ -304,16 +309,16 @@ class Result extends GlobalController
 							$carrerPossibility = $mInterest->getFilteredInterestsData($interestCheck);
 							$scoring[$method]['carrer_possibility']	= $carrerPossibility;
 
-							// function dengan skill yang dibutuhkan per occupation  
+							//mengambil rekomendasi function dengan skill yang dibutuhkan per occupation  
 
-							// foreach ($carrerPossibility as $column => $value) {
-							// 	$occupationSkills = $mSkills->getSkillsByOnetSocCode($value['onetsoc_code']);
-							// 	$scoring[$method]['carrer_possibility'][$column]['skills'] = $occupationSkills;
-							// }
+							/* foreach ($carrerPossibility as $column => $value) {
+								$occupationSkills = $mSkills->getSkillsByOnetSocCode($value['onetsoc_code']);
+								$scoring[$method]['carrer_possibility'][$column]['skills'] = $occupationSkills;
+							}
 
-							// $stringInterest = implode('', $interestCheck);
-							// $recommendation = $mCarrer->baris($stringInterest);
-							// $scoring[$method]['carrer_possibility'] =  explode(',', $recommendation['carrer_possibility']);
+							$stringInterest = implode('', $interestCheck);
+							$recommendation = $mCarrer->baris($stringInterest);
+							$scoring[$method]['carrer_possibility'] =  explode(',', $recommendation['carrer_possibility']); */
 						} else if ($method == "Kesiapan Kerja") {
 							//mengambil rekomendasi pengembangan skill
 
@@ -431,7 +436,6 @@ class Result extends GlobalController
 			}
 
 			$this->response->setHeader('Content-Type', 'application/pdf');
-
 			$mpdf->Output($pdfName, 'I');
 		} catch (\Exception $e) {
 			dd($e->getMessage());
