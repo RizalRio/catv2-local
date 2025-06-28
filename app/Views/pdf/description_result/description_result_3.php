@@ -101,6 +101,14 @@
       background-color: #dc3545;
     }
 
+    .light-blue {
+      background-color: #17a2b8;
+    }
+
+    .yellow {
+      background-color: #ffc107;
+    }
+
     .dot {
       font-size: 30px;
       margin: 40%;
@@ -305,7 +313,7 @@
       </div>
     <?php endif; ?>
 
-    <?php if (isset($scoring['Self Efficacy'])) : ?>
+    <?php if (isset($scoring['Self Efficacy']) || isset($scoring['Self Efficacy SMP-SMA'])) : ?>
       <h3 style="padding-top: 20px">2. Self Efficacy</h3>
       <div>
         <table class="table">
@@ -318,75 +326,229 @@
             <td>Skor Maksimal</td>
             <td>Skor Diperoleh</td>
             <td>Persentase</td>
-            <td>Interpretasi</td>
-            <td style="width: 25%;">Keterangan</td>
+            <?php if (isset($scoring['Self Efficacy SMP-SMA'])): ?>
+              <td colspan="2" style="width: 20%;">Interpretasi</td>
+            <?php elseif (isset($scoring['Self Efficacy'])): ?>
+              <td>Interpretasi</td>
+              <td style="width: 25%;">Keterangan</td>
+            <?php endif; ?>
           </tr>
-          <tr>
-            <td>Level</td>
-            <td><?= count($scoring['Self Efficacy']['data']['Level']['point']) ?></td>
-            <td><?= $scoring['Self Efficacy']['data']['Level']['max_point'] ?></td>
-            <td><?= $scoring['Self Efficacy']['data']['Level']['total_point'] ?></td>
-            <td><?= $scoring['Self Efficacy']['data']['Level']['percentage'] ?>%</td>
-            <td>
-              <?php
-              if ($scoring['Self Efficacy']['data']['Level']['value'] <= 2) {
-                echo 'Rendah';
-              } elseif ($scoring['Self Efficacy']['data']['Level']['value'] > 2 && $scoring['Self Efficacy']['data']['Level']['value'] <= 3) {
-                echo 'Sedang';
-              } elseif ($scoring['Self Efficacy']['data']['Level']['value'] > 3 && $scoring['Self Efficacy']['data']['Level']['value'] <= 5) {
-                echo 'Tinggi';
-              }
-              ?>
-            </td>
-            <td>
-              Mengacu pada sejauh mana seseorang yakin dapat menyelesaikan
-              tugas-tugas dengan berbagai tingkat kesulitan.
-            </td>
-          </tr>
-          <tr>
-            <td>Generality</td>
-            <td><?= count($scoring['Self Efficacy']['data']['Generality']['point']) ?></td>
-            <td><?= $scoring['Self Efficacy']['data']['Generality']['max_point'] ?></td>
-            <td><?= $scoring['Self Efficacy']['data']['Generality']['total_point'] ?></td>
-            <td><?= $scoring['Self Efficacy']['data']['Generality']['percentage'] ?>%</td>
-            <td>
-              <?php
-              if ($scoring['Self Efficacy']['data']['Generality']['value'] <= 2) {
-                echo 'Rendah';
-              } elseif ($scoring['Self Efficacy']['data']['Generality']['value'] > 2 && $scoring['Self Efficacy']['data']['Generality']['value'] <= 3) {
-                echo 'Sedang';
-              } elseif ($scoring['Self Efficacy']['data']['Generality']['value'] > 3 && $scoring['Self Efficacy']['data']['Generality']['value'] <= 5) {
-                echo 'Tinggi';
-              }
-              ?>
-            </td>
-            <td>
-              Menggambarkan sejauh mana keyakinan diri berlaku di berbagai
-              situasi atau bidang kehidupan.
-            </td>
-          </tr>
-          <tr>
-            <td>Strength</td>
-            <td><?= count($scoring['Self Efficacy']['data']['Strenght']['point']) ?></td>
-            <td><?= $scoring['Self Efficacy']['data']['Strenght']['max_point'] ?></td>
-            <td><?= $scoring['Self Efficacy']['data']['Strenght']['total_point'] ?></td>
-            <td><?= $scoring['Self Efficacy']['data']['Strenght']['percentage'] ?>%</td>
-            <td>
-              <?php
-              if ($scoring['Self Efficacy']['data']['Strenght']['value'] <= 2) {
-                echo 'Rendah';
-              } elseif ($scoring['Self Efficacy']['data']['Strenght']['value'] > 2 && $scoring['Self Efficacy']['data']['Strenght']['value'] <= 3) {
-                echo 'Sedang';
-              } elseif ($scoring['Self Efficacy']['data']['Strenght']['value'] > 3 && $scoring['Self Efficacy']['data']['Strenght']['value'] <= 5) {
-                echo 'Tinggi';
-              }
-              ?>
-            </td>
-            <td>
-              Mengacu pada seberapa kuat keyakinan seseorang dalam menghadapi
-              tugas atau tantangan.
-            </td>
-          </tr>
+          <?php if (isset($scoring['Self Efficacy']['data']['Level'])): ?>
+            <tr>
+              <td>Level</td>
+              <td><?= count($scoring['Self Efficacy']['data']['Level']['point']) ?></td>
+              <td><?= $scoring['Self Efficacy']['data']['Level']['max_point'] ?></td>
+              <td><?= $scoring['Self Efficacy']['data']['Level']['total_point'] ?></td>
+              <td><?= $scoring['Self Efficacy']['data']['Level']['percentage'] ?>%</td>
+              <td>
+                <?php
+                if ($scoring['Self Efficacy']['data']['Level']['value'] <= 2) {
+                  echo 'Rendah';
+                } elseif ($scoring['Self Efficacy']['data']['Level']['value'] > 2 && $scoring['Self Efficacy']['data']['Level']['value'] <= 3) {
+                  echo 'Sedang';
+                } elseif ($scoring['Self Efficacy']['data']['Level']['value'] > 3 && $scoring['Self Efficacy']['data']['Level']['value'] <= 5) {
+                  echo 'Tinggi';
+                }
+                ?>
+              </td>
+              <td>
+                Mengacu pada sejauh mana seseorang yakin dapat menyelesaikan
+                tugas-tugas dengan berbagai tingkat kesulitan.
+              </td>
+            </tr>
+          <?php endif; ?>
+          <?php if (isset($scoring['Self Efficacy']['data']['Generality'])): ?>
+            <tr>
+              <td>Generality</td>
+              <td><?= count($scoring['Self Efficacy']['data']['Generality']['point']) ?></td>
+              <td><?= $scoring['Self Efficacy']['data']['Generality']['max_point'] ?></td>
+              <td><?= $scoring['Self Efficacy']['data']['Generality']['total_point'] ?></td>
+              <td><?= $scoring['Self Efficacy']['data']['Generality']['percentage'] ?>%</td>
+              <td>
+                <?php
+                if ($scoring['Self Efficacy']['data']['Generality']['value'] <= 2) {
+                  echo 'Rendah';
+                } elseif ($scoring['Self Efficacy']['data']['Generality']['value'] > 2 && $scoring['Self Efficacy']['data']['Generality']['value'] <= 3) {
+                  echo 'Sedang';
+                } elseif ($scoring['Self Efficacy']['data']['Generality']['value'] > 3 && $scoring['Self Efficacy']['data']['Generality']['value'] <= 5) {
+                  echo 'Tinggi';
+                }
+                ?>
+              </td>
+              <td>
+                Menggambarkan sejauh mana keyakinan diri berlaku di berbagai
+                situasi atau bidang kehidupan.
+              </td>
+            </tr>
+          <?php endif; ?>
+          <?php if (isset($scoring['Self Efficacy']['data']['Persistence'])): ?>
+            <tr>
+              <td>Persistence</td>
+              <td><?= count($scoring['Self Efficacy']['data']['Persistence']['point']) ?></td>
+              <td><?= $scoring['Self Efficacy']['data']['Persistence']['max_point'] ?></td>
+              <td><?= $scoring['Self Efficacy']['data']['Persistence']['total_point'] ?></td>
+              <td><?= $scoring['Self Efficacy']['data']['Persistence']['percentage'] ?>%</td>
+              <td>
+                <?php
+                if ($scoring['Self Efficacy']['data']['Persistence']['value'] <= 2) {
+                  echo 'Rendah';
+                } elseif ($scoring['Self Efficacy']['data']['Persistence']['value'] > 2 && $scoring['Self Efficacy']['data']['Persistence']['value'] <= 3) {
+                  echo 'Sedang';
+                } elseif ($scoring['Self Efficacy']['data']['Persistence']['value'] > 3 && $scoring['Self Efficacy']['data']['Persistence']['value'] <= 5) {
+                  echo 'Tinggi';
+                }
+                ?>
+              </td>
+              <td>
+                Mengacu pada ketekunan dan ketahanan seseorang dalam menghadapi
+                rintangan atau kesulitan.
+              </td>
+            </tr>
+          <?php endif; ?>
+          <?php if (isset($scoring['Self Efficacy']['data']['Strenght'])): ?>
+            <tr>
+              <td>Strength</td>
+              <td><?= count($scoring['Self Efficacy']['data']['Strenght']['point']) ?></td>
+              <td><?= $scoring['Self Efficacy']['data']['Strenght']['max_point'] ?></td>
+              <td><?= $scoring['Self Efficacy']['data']['Strenght']['total_point'] ?></td>
+              <td><?= $scoring['Self Efficacy']['data']['Strenght']['percentage'] ?>%</td>
+              <td>
+                <?php
+                if ($scoring['Self Efficacy']['data']['Strenght']['value'] <= 2) {
+                  echo 'Rendah';
+                } elseif ($scoring['Self Efficacy']['data']['Strenght']['value'] > 2 && $scoring['Self Efficacy']['data']['Strenght']['value'] <= 3) {
+                  echo 'Sedang';
+                } elseif ($scoring['Self Efficacy']['data']['Strenght']['value'] > 3 && $scoring['Self Efficacy']['data']['Strenght']['value'] <= 5) {
+                  echo 'Tinggi';
+                }
+                ?>
+              </td>
+              <td>
+                Mengacu pada seberapa kuat keyakinan seseorang dalam menghadapi
+                tugas atau tantangan.
+              </td>
+            </tr>
+          <?php endif; ?>
+          <?php if (isset($scoring['Self Efficacy SMP-SMA']['data']['Academic Self-Efficacy'])) : ?>
+            <tr>
+              <td>Academic Self-Efficacy</td>
+              <td><?= count($scoring['Self Efficacy SMP-SMA']['data']['Academic Self-Efficacy']['point']) ?></td>
+              <td><?= $scoring['Self Efficacy SMP-SMA']['data']['Academic Self-Efficacy']['max_point'] ?></td>
+              <td><?= $scoring['Self Efficacy SMP-SMA']['data']['Academic Self-Efficacy']['total_point'] ?></td>
+              <td><?= $scoring['Self Efficacy SMP-SMA']['data']['Academic Self-Efficacy']['percentage'] ?>%</td>
+              <td colspan="2">
+                <?php
+                if ($scoring['Self Efficacy SMP-SMA']['data']['Academic Self-Efficacy']['value'] <= 2) {
+                  echo 'Rendah';
+                } elseif ($scoring['Self Efficacy SMP-SMA']['data']['Academic Self-Efficacy']['value'] > 2 && $scoring['Self Efficacy SMP-SMA']['data']['Academic Self-Efficacy']['value'] <= 3) {
+                  echo 'Sedang';
+                } elseif ($scoring['Self Efficacy SMP-SMA']['data']['Academic Self-Efficacy']['value'] > 3 && $scoring['Self Efficacy SMP-SMA']['data']['Academic Self-Efficacy']['value'] <= 5) {
+                  echo 'Tinggi';
+                }
+                ?>
+              </td>
+            </tr>
+          <?php endif; ?>
+          <?php if (isset($scoring['Self Efficacy SMP-SMA']['data']['Carrer Self-Efficacy'])) : ?>
+            <tr>
+              <td>Carrer Self-Efficacy</td>
+              <td><?= count($scoring['Self Efficacy SMP-SMA']['data']['Carrer Self-Efficacy']['point']) ?></td>
+              <td><?= $scoring['Self Efficacy SMP-SMA']['data']['Carrer Self-Efficacy']['max_point'] ?></td>
+              <td><?= $scoring['Self Efficacy SMP-SMA']['data']['Carrer Self-Efficacy']['total_point'] ?></td>
+              <td><?= $scoring['Self Efficacy SMP-SMA']['data']['Carrer Self-Efficacy']['percentage'] ?>%</td>
+              <td colspan="2">
+                <?php
+                if ($scoring['Self Efficacy SMP-SMA']['data']['Carrer Self-Efficacy']['value'] <= 2) {
+                  echo 'Rendah';
+                } elseif ($scoring['Self Efficacy SMP-SMA']['data']['Carrer Self-Efficacy']['value'] > 2 && $scoring['Self Efficacy SMP-SMA']['data']['Carrer Self-Efficacy']['value'] <= 3) {
+                  echo 'Sedang';
+                } elseif ($scoring['Self Efficacy SMP-SMA']['data']['Carrer Self-Efficacy']['value'] > 3 && $scoring['Self Efficacy SMP-SMA']['data']['Carrer Self-Efficacy']['value'] <= 5) {
+                  echo 'Tinggi';
+                }
+                ?>
+              </td>
+            </tr>
+          <?php endif; ?>
+          <?php if (isset($scoring['Self Efficacy SMP-SMA']['data']['Problem-Solving Efficacy'])) : ?>
+            <tr>
+              <td>Problem-Solving Efficacy</td>
+              <td><?= count($scoring['Self Efficacy SMP-SMA']['data']['Problem-Solving Efficacy']['point']) ?></td>
+              <td><?= $scoring['Self Efficacy SMP-SMA']['data']['Problem-Solving Efficacy']['max_point'] ?></td>
+              <td><?= $scoring['Self Efficacy SMP-SMA']['data']['Problem-Solving Efficacy']['total_point'] ?></td>
+              <td><?= $scoring['Self Efficacy SMP-SMA']['data']['Problem-Solving Efficacy']['percentage'] ?>%</td>
+              <td colspan="2">
+                <?php
+                if ($scoring['Self Efficacy SMP-SMA']['data']['Problem-Solving Efficacy']['value'] <= 2) {
+                  echo 'Rendah';
+                } elseif ($scoring['Self Efficacy SMP-SMA']['data']['Problem-Solving Efficacy']['value'] > 2 && $scoring['Self Efficacy SMP-SMA']['data']['Problem-Solving Efficacy']['value'] <= 3) {
+                  echo 'Sedang';
+                } elseif ($scoring['Self Efficacy SMP-SMA']['data']['Problem-Solving Efficacy']['value'] > 3 && $scoring['Self Efficacy SMP-SMA']['data']['Problem-Solving Efficacy']['value'] <= 5) {
+                  echo 'Tinggi';
+                }
+                ?>
+              </td>
+            </tr>
+          <?php endif; ?>
+          <?php if (isset($scoring['Self Efficacy SMP-SMA']['data']['Initiative & Persistence'])) : ?>
+            <tr>
+              <td>Initiative & Persistence</td>
+              <td><?= count($scoring['Self Efficacy SMP-SMA']['data']['Initiative & Persistence']['point']) ?></td>
+              <td><?= $scoring['Self Efficacy SMP-SMA']['data']['Initiative & Persistence']['max_point'] ?></td>
+              <td><?= $scoring['Self Efficacy SMP-SMA']['data']['Initiative & Persistence']['total_point'] ?></td>
+              <td><?= $scoring['Self Efficacy SMP-SMA']['data']['Initiative & Persistence']['percentage'] ?>%</td>
+              <td colspan="2">
+                <?php
+                if ($scoring['Self Efficacy SMP-SMA']['data']['Initiative & Persistence']['value'] <= 2) {
+                  echo 'Rendah';
+                } elseif ($scoring['Self Efficacy SMP-SMA']['data']['Initiative & Persistence']['value'] > 2 && $scoring['Self Efficacy SMP-SMA']['data']['Initiative & Persistence']['value'] <= 3) {
+                  echo 'Sedang';
+                } elseif ($scoring['Self Efficacy SMP-SMA']['data']['Initiative & Persistence']['value'] > 3 && $scoring['Self Efficacy SMP-SMA']['data']['Initiative & Persistence']['value'] <= 5) {
+                  echo 'Tinggi';
+                }
+                ?>
+              </td>
+            </tr>
+          <?php endif; ?>
+          <?php if (isset($scoring['Self Efficacy SMP-SMA']['data']['Emotional Self-Efficacy'])) : ?>
+            <tr>
+              <td>Emotional Self-Efficacy</td>
+              <td><?= count($scoring['Self Efficacy SMP-SMA']['data']['Emotional Self-Efficacy']['point']) ?></td>
+              <td><?= $scoring['Self Efficacy SMP-SMA']['data']['Emotional Self-Efficacy']['max_point'] ?></td>
+              <td><?= $scoring['Self Efficacy SMP-SMA']['data']['Emotional Self-Efficacy']['total_point'] ?></td>
+              <td><?= $scoring['Self Efficacy SMP-SMA']['data']['Emotional Self-Efficacy']['percentage'] ?>%</td>
+              <td colspan="2">
+                <?php
+                if ($scoring['Self Efficacy SMP-SMA']['data']['Emotional Self-Efficacy']['value'] <= 2) {
+                  echo 'Rendah';
+                } elseif ($scoring['Self Efficacy SMP-SMA']['data']['Emotional Self-Efficacy']['value'] > 2 && $scoring['Self Efficacy SMP-SMA']['data']['Emotional Self-Efficacy']['value'] <= 3) {
+                  echo 'Sedang';
+                } elseif ($scoring['Self Efficacy SMP-SMA']['data']['Emotional Self-Efficacy']['value'] > 3 && $scoring['Self Efficacy SMP-SMA']['data']['Emotional Self-Efficacy']['value'] <= 5) {
+                  echo 'Tinggi';
+                }
+                ?>
+              </td>
+            </tr>
+          <?php endif; ?>
+          <?php if (isset($scoring['Self Efficacy SMP-SMA']['data']['Adaptability / Initiative'])) : ?>
+            <tr>
+              <td>Adaptability / Initiative</td>
+              <td><?= count($scoring['Self Efficacy SMP-SMA']['data']['Adaptability / Initiative']['point']) ?></td>
+              <td><?= $scoring['Self Efficacy SMP-SMA']['data']['Adaptability / Initiative']['max_point'] ?></td>
+              <td><?= $scoring['Self Efficacy SMP-SMA']['data']['Adaptability / Initiative']['total_point'] ?></td>
+              <td><?= $scoring['Self Efficacy SMP-SMA']['data']['Adaptability / Initiative']['percentage'] ?>%</td>
+              <td colspan="2">
+                <?php
+                if ($scoring['Self Efficacy SMP-SMA']['data']['Adaptability / Initiative']['value'] <= 2) {
+                  echo 'Rendah';
+                } elseif ($scoring['Self Efficacy SMP-SMA']['data']['Adaptability / Initiative']['value'] > 2 && $scoring['Self Efficacy SMP-SMA']['data']['Adaptability / Initiative']['value'] <= 3) {
+                  echo 'Sedang';
+                } elseif ($scoring['Self Efficacy SMP-SMA']['data']['Adaptability / Initiative']['value'] > 3 && $scoring['Self Efficacy SMP-SMA']['data']['Adaptability / Initiative']['value'] <= 5) {
+                  echo 'Tinggi';
+                }
+                ?>
+              </td>
+            </tr>
+          <?php endif; ?>
         </table>
         <p>
           <strong>Self-efficacy</strong> adalah keyakinan individu terhadap
@@ -399,57 +561,107 @@
       </div>
     <?php endif; ?>
 
-    <?php if (isset($scoring['Kesiapan Kerja'])) : ?>
-      <h3>3. Kesiapan Kerja</h3>
+    <?php if (isset($scoring['Kesiapan Kerja']) || isset($scoring['Kompetensi'])) : ?>
+      <h3>3. <?= isset($scoring['Kesiapan Kerja']) ? 'Kesiapan Kerja' : 'Kompetensi' ?></h3>
       <div>
         <table class="table">
           <tr>
             <th style="width: 30%; text-align: center">Skill</th>
             <th style="width: 60%; text-align: center">Skor</th>
           </tr>
-          <?php foreach ($scoring['Kesiapan Kerja']['data'] as $keyKarir => $valueKarir) : ?>
-            <tr>
-              <?php
-              if ($keyKarir == 'Self-management') {
-                $color = 'green';
-              } elseif ($keyKarir == 'Team Work') {
-                $color = 'blue';
-              } elseif ($keyKarir == 'Communication Skill') {
-                $color = 'purple';
-              } elseif ($keyKarir == 'Problem Solving & Decision Making') {
-                $color = 'red';
-              } elseif ($keyKarir == 'Organization & Planning') {
-                $color = 'orange';
-              } elseif ($keyKarir == 'Initiative & Enterprise') {
-                $color = 'light-orange';
-              }
-              ?>
-              <td class="kode"><?= $keyKarir ?></td>
-              <td>
-                <table class="graf_bar">
-                  <tr>
-                    <td class="<?= $color ?>" style="width: <?= $valueKarir['percentage'] ?>%"><?= $valueKarir['percentage'] ?>%</td>
-                    <td></td>
-                    <td></td>
-                  </tr>
-                </table>
-              </td>
-            </tr>
-          <?php endforeach; ?>
+          <?php if (isset($scoring['Kompetensi']['data'])) : ?>
+            <?php foreach ($scoring['Kompetensi']['data'] as $keyKompetensi => $valueKompetensi) : ?>
+              <tr>
+                <?php
+                if ($keyKompetensi == 'Decision Making') {
+                  $color = 'green';
+                } elseif ($keyKompetensi == 'Problem Solving') {
+                  $color = 'blue';
+                } elseif ($keyKompetensi == 'Self-Management') {
+                  $color = 'purple';
+                } elseif ($keyKompetensi == 'Initiative and Adaptability') {
+                  $color = 'red';
+                } elseif ($keyKompetensi == 'Exploration & Growth') {
+                  $color = 'orange';
+                } elseif ($keyKompetensi == 'Collaboration') {
+                  $color = 'light-orange';
+                } elseif ($keyKompetensi == 'Emotional Resilience') {
+                  $color = 'light-blue';
+                } elseif ($keyKompetensi == 'Communication') {
+                  $color = 'yellow';
+                }
+                ?>
+                <td class="kode"><?= $keyKompetensi ?></td>
+                <td>
+                  <table class="graf_bar">
+                    <tr>
+                      <td class="<?= $color ?>" style="width: <?= $valueKompetensi['percentage'] ?>%"><?= $valueKompetensi['percentage'] ?>%</td>
+                      <td></td>
+                      <td></td>
+                    </tr>
+                  </table>
+                </td>
+              </tr>
+            <?php endforeach; ?>
+          <?php endif; ?>
+          <?php if (isset($scoring['Kesiapan Kerja']['data'])) : ?>
+            <?php foreach ($scoring['Kesiapan Kerja']['data'] as $keyKarir => $valueKarir) : ?>
+              <tr>
+                <?php
+                if ($keyKarir == 'Self-management') {
+                  $color = 'green';
+                } elseif ($keyKarir == 'Team Work') {
+                  $color = 'blue';
+                } elseif ($keyKarir == 'Communication Skill') {
+                  $color = 'purple';
+                } elseif ($keyKarir == 'Problem Solving & Decision Making') {
+                  $color = 'red';
+                } elseif ($keyKarir == 'Organization & Planning') {
+                  $color = 'orange';
+                } elseif ($keyKarir == 'Initiative & Enterprise') {
+                  $color = 'light-orange';
+                }
+                ?>
+                <td class="kode"><?= $keyKarir ?></td>
+                <td>
+                  <table class="graf_bar">
+                    <tr>
+                      <td class="<?= $color ?>" style="width: <?= $valueKarir['percentage'] ?>%"><?= $valueKarir['percentage'] ?>%</td>
+                      <td></td>
+                      <td></td>
+                    </tr>
+                  </table>
+                </td>
+              </tr>
+            <?php endforeach; ?>
+          <?php endif; ?>
         </table>
-        <p>
-          Kesiapan kerja adalah kemampuan dan sikap individu yang mendukung
-          mereka untuk berhasil memasuki dan menjalani dunia kerja. Konsep ini
-          fokus pada soft skills diperlukan untuk beradaptasi dan berkontribusi
-          secara efektif di lingkungan kerja. Karena kesiapan kerja tidak hanya
-          berfokus pada keterampilan teknis saja. Soft skills adalah kemampuan
-          non-teknis yang mendukung individu untuk berkomunikasi, bekerja sama,
-          dan beradaptasi secara efektif di tempat kerja. Soft skills
-          mencerminkan kemampuan seseorang untuk berkembang dalam lingkungan
-          kerja yang dinamis.
-        </p>
+        <?php if (isset($scoring['Kesiapan Kerja']['data'])) : ?>
+          <p>
+            Kesiapan kerja adalah kemampuan dan sikap individu yang mendukung
+            mereka untuk berhasil memasuki dan menjalani dunia kerja. Konsep ini
+            fokus pada soft skills diperlukan untuk beradaptasi dan berkontribusi
+            secara efektif di lingkungan kerja. Karena kesiapan kerja tidak hanya
+            berfokus pada keterampilan teknis saja. Soft skills adalah kemampuan
+            non-teknis yang mendukung individu untuk berkomunikasi, bekerja sama,
+            dan beradaptasi secara efektif di tempat kerja. Soft skills
+            mencerminkan kemampuan seseorang untuk berkembang dalam lingkungan
+            kerja yang dinamis.
+          </p>
+        <?php endif; ?>
+        <?php if (isset($scoring['Kompetensi']['data'])) : ?>
+          <p>
+            Kompetensi adalah seperangkat pengetahuan, keterampilan, dan sikap
+            yang diperlukan untuk melakukan tugas atau pekerjaan dengan
+            efektif. Kompetensi mencakup berbagai aspek, termasuk kemampuan
+            teknis, keterampilan interpersonal, dan sikap profesional. Dalam konteks
+            dunia kerja, kompetensi mencerminkan kemampuan individu untuk
+            menyelesaikan tantangan, berkomunikasi dengan orang lain, dan
+            beradaptasi dalam lingkungan kerja yang dinamis.
+          </p>
+        <?php endif; ?>
         <p style="margin: 10px">
-          Mengapa soft skills penting untuk kesiapan kerja?
+          Mengapa soft skills penting untuk kesiapan kerja ?
         </p>
         <ol style="margin: 0">
           <li>

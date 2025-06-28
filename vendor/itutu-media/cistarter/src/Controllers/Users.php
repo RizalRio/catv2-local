@@ -347,7 +347,7 @@ class Users extends AdminController
 
 			($this->request->getPost('active') == 1) ? $user->activate() : '';
 
-			$users = $users->withGroup($this->request->getPost('groups'));
+			$users = $users->withGroup(($this->request->getPost('groups')) ? $this->request->getPost('groups') : 'DF');
 			$users->save($user);
 
 			$user = $users->where('email', $this->request->getPost('email'))->first();
